@@ -13,8 +13,12 @@
     "@nuxt/eslint": "1.4.1",
     "@nuxt/icon": "1.13.0",
     "@nuxt/image": "1.10.0",
+    "@primeuix/themes": "^1.1.1",
+    "@primevue/forms": "^4.3.4",
+    "@primevue/nuxt-module": "4.3.4",
     "eslint": "^9.0.0",
     "nuxt": "^3.17.4",
+    "primevue": "^4.3.4",
     "vue": "^3.5.14",
     "vue-router": "^4.5.1"
   },
