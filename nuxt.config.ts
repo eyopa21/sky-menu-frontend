@@ -12,6 +12,8 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@nuxtjs/tailwindcss'
   ], 
+
+  
   primevue: {
     autoImport: true,
     options: {

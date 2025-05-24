@@ -1,18 +1,56 @@
 <script setup lang="ts">
-definePageMeta({
-    layout: 'auth',
-})
+import { ref } from 'vue';
+import { zodResolver } from '@primevue/forms/resolvers/zod';
 
+const {$api} = useNuxtApp()
+import { useToast } from 'primevue/usetoast';
+import { LoginValidationSchema, type TLoginValidationSchema } from '~/zod/LoginValidation';
+import type { FormSubmitEvent } from '@primevue/forms/form';
+import { authRepository } from '~/repositories/auth';
+
+const toast = useToast();
+
+const initialValues = ref({
+    email: undefined,
+    password: undefined
+});
+
+const resolver = zodResolver(
+    LoginValidationSchema
+);
+
+
+
+const authRepo = authRepository($api)
+const onFormSubmit = async (e: FormSubmitEvent<TLoginValidationSchema>) => {
+    console.log('Form submitted:', e);
+    if (e.valid) {
+
+        toast.add({ severity: 'success', summary: 'Form is submitted.', life: 3000 });
+        try {
+            const data = await authRepo.login(e.values);
+            
+            console.log(data)
+            if (data) {
+                toast.add({ severity: 'success', summary: 'Login successful!', life: 3000 });
+               
+                navigateTo('/');
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            toast.add({ severity: 'error', summary: 'An error occurred.', life: 3000 });
+        }
+    }
+};
 </script>
-
-
 
 
 <template>
     <div
-        class="px-8 py-20 md:px-12 lg:px-20 flex items-center min-h-screen justify-center  backdrop-blur-3xl !bg-cover !bg-center !bg-no-repeat"
-        style="background-image: url('https://fqjltiegiezfetthbags.supabase.co/storage/v1/object/public/block.images/blocks/signin/signin-glass.jpg')"
+    class="px-8 py-20 md:px-12 lg:px-20 flex items-center min-h-screen justify-center backdrop-blur-3xl !bg-cover !bg-center !bg-no-repeat"
+    style="background-image: url('https://fqjltiegiezfetthbags.supabase.co/storage/v1/object/public/block.images/blocks/signin/signin-glass.jpg')"
     >
+    <Toast/>
         <div class="px-8 md:px-12 lg:px-20 py-12 flex flex-col items-center gap-12 w-full max-w-xl backdrop-blur-2xl rounded-2xl bg-white/10 border border-white/10">
             <div class="flex flex-col items-center gap-4 w-full">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14" width="33" height="32" viewBox="0 0 33 32" fill="none">
@@ -31,28 +69,38 @@ definePageMeta({
                     </div>
                 </div>
             </div>
-            <div class="flex flex-col items-center gap-8 w-full">
+            <Form v-slot="$form" :initial-values :resolver class="flex flex-col items-center gap-8 w-full" @submit="onFormSubmit">
                 <div class="flex flex-col gap-6 w-full">
                     <IconField>
-                        <InputIcon>
-                        <Icon name="mdi:account"/>
+                        <InputIcon  >
+                        <Icon name="mdi:account" class="!text-white/70" />
                         </InputIcon>
-                        <InputText type="text" class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm" placeholder="Username" />
+                        <InputText name="email"  class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm" placeholder="Username" />
                     </IconField>
+                    <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple">{{
+                    $form.email.error.message }}</Message>
                     <IconField>
-                        <InputIcon>
-                        <Icon name="mdi:lock"/>
+                        <InputIcon  >
+                        <Icon name="mdi:lock" class="!text-white/70" />
                         </InputIcon>
                         <InputText
+                            name="password"
                             type="password"
                             class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm"
                             placeholder="Password"
+                            :toggle-mask="true"
                         />
                     </IconField>
+                    <Message v-if="$form.password?.invalid" severity="error" size="small" variant="simple">
+                    <ul class="my-0 px-4 flex flex-col gap-1">
+                        <li v-for="(error, index) of $form.password.errors" :key="index">{{ error.message }}</li>
+                    </ul>
+                </Message>
                 </div>
-                <Button label="Sign In" class="!w-full !rounded-3xl !bg-surface-950 !border !border-surface-950 !text-white hover:!bg-surface-950/80" />
-            </div>
+                <Button type="submit" label="Sign In" class="!w-full !rounded-3xl !bg-surface-950 !border !border-surface-950 !text-white hover:!bg-surface-950/80" />
+            </Form>
             <a class="text-white/80 cursor-pointer hover:text-white/90">Forgot Password?</a>
         </div>
     </div>
 </template>
+
