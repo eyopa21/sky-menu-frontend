@@ -2,12 +2,12 @@
 import { ref } from 'vue';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 
-const { $api } = useNuxtApp()
 import { useToast } from 'primevue/usetoast';
 import { LoginValidationSchema, type TLoginValidationSchema } from '~/zod/LoginValidation';
 import type { FormSubmitEvent } from '@primevue/forms/form';
 import { authRepository } from '~/repositories/auth';
 
+const { $api } = useNuxtApp()
 const { $authentication } = useNuxtApp();
 const toast = useToast();
 

@@ -1,94 +1,139 @@
+<script setup lang="ts">
+
+import type { FetchResult, NuxtError } from '#app';
+import type { FormSubmitEvent } from '@primevue/forms/form';
+import { zodResolver } from '@primevue/forms/resolvers/zod';
+import { userRepository } from '~/repositories/users';
+import { UpdateAccountValidationSchema, type TUpdateAccountValidationSchema } from '~/zod/AccountUpdate';
+
+
+const { $authentication, $api } = useNuxtApp();
+const toast = useToast();
+const userRepo = userRepository($api)
+const currentUser = $authentication.session.value?.user
+
+const initialValues = ref({
+
+    full_name: currentUser?.full_name,
+    phone_number: currentUser?.phone_number, 
+    birth_date: currentUser?.date_of_birth, 
+    sex: currentUser?.sex
+
+});
+
+const resolver = zodResolver(
+    UpdateAccountValidationSchema
+);
+
+async function onFormSubmit(e: FormSubmitEvent<TUpdateAccountValidationSchema>) {
+    if (e.valid && currentUser?.id) {
+        try {
+            const data = await userRepo.updateMyAccount(currentUser?.id, e.values);
+            if (data) {
+                console.log('Update successful:', data);
+                $authentication.updateSession({
+                    accessToken: $authentication.session.value?.accessToken!, 
+                    refreshToken: $authentication.session.value?.refreshToken!,
+                    user: data
+                })
+                toast.add({ severity: 'success', summary: 'Profile updated successfully!', life: 3000 });
+            }
+        } catch (err: unknown) {
+            console.log('Update error:', err);
+            toast.add({ severity: 'error', summary: err!.message || 'An error occurred while updating profile.', life: 3000 });
+        }
+    }
+}
+
+</script>
+
 <template>
-    <div
+    <Form v-slot="$form" :initial-values :resolver @submit="onFormSubmit"
         class="p-6 md:p-12 rounded-2.5xl lg:rounded-4xl bg-white/16 backdrop-blur-[48px] max-w-[calc(100%-3rem)] lg:max-w-none mx-auto shadow-[0px_2px_5px_0px_rgba(255,255,255,0.06)_inset,0px_12px_20px_0px_rgba(0,0,0,0.06)]">
-        <div class="pb-10 border-b border-white/12 flex md:flex-row flex-col items-start gap-4">
+        <div class="pb-10 border-b border-white/12 flex flex-col items-start gap-4">
             <div class="md:flex-[0.45] flex flex-col gap-1"><span class="text-xl font-medium ">Your
                     Photo</span><span class="text-white/64">This
                     will be displayed on your profile.</span></div>
-            <div class="md:flex-[0.55] flex items-center gap-4">
-                <div
-                    class="w-16 h-16 flex items-center justify-center rounded-full bg-white/16 shadow-[0px_2px_5px_0px_rgba(255,255,255,0.06)_inset,0px_12px_20px_0px_rgba(0,0,0,0.06)]">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
-                        <path
-                            d="M26.8844 14C27.5005 14 28.0045 13.4997 27.9555 12.8856C27.7658 10.5094 26.9717 8.21425 25.6405 6.222C24.1022 3.91972 21.9157 2.12531 19.3575 1.06569C16.7994 0.00606592 13.9844 -0.27118 11.2687 0.269012C8.55298 0.809203 6.05843 2.14257 4.1005 4.1005C2.14257 6.05843 0.809203 8.55298 0.269011 11.2687C-0.27118 13.9844 0.00606599 16.7994 1.06569 19.3575C2.12531 21.9157 3.91972 24.1022 6.222 25.6405C8.21425 26.9717 10.5094 27.7658 12.8856 27.9555C13.4997 28.0045 14 27.5005 14 26.8844V23.5155C14 22.8994 13.4983 22.4076 12.8877 22.326C11.6208 22.1567 10.4041 21.6998 9.33319 20.9843C7.95182 20.0613 6.87517 18.7494 6.2394 17.2145C5.60362 15.6796 5.43728 13.9906 5.76139 12.3612C6.08551 10.7318 6.88553 9.23504 8.06028 8.06028C9.23504 6.88553 10.7318 6.08551 12.3612 5.76139C13.9906 5.43728 15.6796 5.60362 17.2145 6.2394C18.7494 6.87517 20.0613 7.95182 20.9843 9.33319C21.6998 10.4041 22.1567 11.6208 22.326 12.8877C22.4076 13.4983 22.8994 14 23.5155 14H26.8844Z"
-                            fill="white"></path>
-                        <path
-                            d="M20.5013 15.3426C20.5077 15.3118 20.484 15.2829 20.4525 15.2829H16.3982C15.7821 15.2829 15.2826 15.7823 15.2826 16.3984V20.4526C15.2826 20.4841 15.3115 20.5077 15.3423 20.5014C17.9308 19.9697 19.9695 17.931 20.5013 15.3426Z"
-                            fill="white"></path>
-                        <path
-                            d="M22.2952 15.2829C22.2474 15.2829 22.2067 15.318 22.1989 15.3652C21.621 18.8613 18.8611 21.6212 15.3649 22.1989C15.3177 22.2067 15.2826 22.2474 15.2826 22.2953V26.8845C15.2826 27.5006 15.7821 28 16.3982 28H18.6292C19.2453 28 19.7448 27.5006 19.7448 26.8845V22.5905C19.7448 22.5727 19.7663 22.5638 19.7789 22.5764L24.4655 27.263C24.9011 27.6986 25.6075 27.6986 26.0431 27.263L27.2627 26.0434C27.6983 25.6077 27.6983 24.9014 27.2627 24.4658L22.5761 19.7792C22.5635 19.7666 22.5724 19.745 22.5902 19.745H26.8842C27.5003 19.745 27.9997 19.2456 27.9997 18.6295V16.3984C27.9997 15.7823 27.5003 15.2829 26.8842 15.2829H22.2952Z"
-                            fill="white"></path>
-                    </svg>
-                </div><button class=" hover:text-surface-200">Update</button><button
-                    class="text-red-400 hover:text-red-500">Delete</button>
-            </div>
+            <!-- <div class="md:flex-[0.55] flex items-center gap-4  w-full">
+                 <AppFileUploader @file-uploaded="" />
+            </div> -->
         </div>
-        <div class="py-10 border-b border-white/12 flex flex-col gap-10">
+        <div class="py-10   flex flex-col gap-10">
             <div class="flex -col sm:flex-row justify-between gap-2 items-center">
                 <div class=" text-lg  font-medium">Username</div>
                 <IconField class="w-1/2">
                     <InputIcon>
                         <Icon name="mdi:account" class="!text-white/70" />
                     </InputIcon>
-                    <InputText size="large"
+                    <InputText name="full_name" size="large"
                         class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm"
-                        placeholder="Username" />
+                        placeholder="Full name" />
+                <Message v-if="$form.full_name?.invalid" severity="error" size="small" variant="simple">{{
+                        $form.full_name.error.message }}</Message>
                 </IconField>
             </div>
             <div class="flex flex-col justify-between sm:flex-row gap-2 items-center">
+                <div class=" text-lg  font-medium">Phone number</div>
+                <IconField class="w-1/2">
+                    <InputIcon>
+                        <Icon name="mdi:phone" class="!text-white/70" />
+                    </InputIcon>
+                    <InputText  name="phone_number" size="large"
+                        class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm"
+                        placeholder="Phone number" />
+                        
+                <Message v-if="$form.phone_number?.invalid" severity="error" size="small" variant="simple">{{
+                        $form.phone_number.error.message }}</Message>
+                </IconField>
+            </div>
+            <div class="flex flex-col justify-between sm:flex-row gap-2 items-center">
+                <div class=" text-lg  font-medium">Date of Birth</div>
+                <IconField class="w-1/2">
+                    <InputIcon>
+                        <Icon name="mdi:calendar" class="!text-white/70" />
+                    </InputIcon>
+                    <!-- <InputText  name="date_of_birth" size="large"
+                        class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm"
+                        placeholder="Date of birth" /> -->
+                        <DatePicker name="date_of_birth" showIcon fluid iconDisplay="input" />
+                <Message v-if="$form.date_of_birth?.invalid" severity="error" size="small" variant="simple">{{
+                        $form.date_of_birth.error.message }}</Message>
+                </IconField>
+            </div>
+
+            <div class="flex flex-col justify-between sm:flex-row gap-2 items-center">
+                <div class=" text-lg  font-medium">Gender</div>
+               
+                   
+                    <SelectButton name="sex"  :options="['male', 'female']" size="large" />
+                <Message v-if="$form.sex?.invalid" severity="error" size="small" variant="simple">{{
+                        $form.sex.error.message }}</Message>
+               
+            </div>
+
+
+        </div>
+        <div class="py-10   flex flex-col gap-10">
+            <div class="flex flex-col sm:flex-row gap-2 items-center justify-between">
                 <div class=" text-lg  font-medium">Email</div>
                 <IconField class="w-1/2">
                     <InputIcon>
-                        <Icon name="mdi:account" class="!text-white/70" />
+                        <Icon name="mdi:gmail" class="!text-white/70" />
                     </InputIcon>
-                    <InputText size="large"
-                        class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm"
-                        placeholder="Username" />
+                    <InputText :value="currentUser?.email" size="large" :disabled="true"
+                        class="  !w-full   !rounded-3xl !shadow-sm disabled:cursor-not-allowed"
+                        placeholder="Email address" />
                 </IconField>
             </div>
-            <div class="flex flex-col justify-between sm:flex-row gap-2 items-center">
-                <div class=" text-lg  font-medium">Bio</div>
-                <IconField class="w-1/2">
-                    <InputIcon>
-                        <Icon name="mdi:account" class="!text-white/70" />
-                    </InputIcon>
-                    <InputText size="large"
-                        class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm"
-                        placeholder="Username" />
-                </IconField>
-            </div>
-        </div>
-        <div class="py-10 border-b border-white/12 flex flex-col gap-10">
-            <div class="flex flex-col sm:flex-row gap-2 items-center justify-between">
-                <div class=" text-lg  font-medium">Change Password</div>
-                <IconField class="w-1/2">
-                    <InputIcon>
-                        <Icon name="mdi:account" class="!text-white/70" />
-                    </InputIcon>
-                    <InputText size="large"
-                        class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm"
-                        placeholder="Username" />
-                </IconField>
-            </div>
-            <div class="flex flex-col sm:flex-row gap-2 items-center justify-between">
-                <div class=" text-lg  font-medium">Enter Password Again</div>
-                <IconField class="w-1/2">
-                    <InputIcon>
-                        <Icon name="mdi:account" class="!text-white/70" />
-                    </InputIcon>
-                    <InputText size="large"
-                        class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm"
-                        placeholder="Username" />
-                </IconField>
-            </div>
+            
         </div>
         <div class="pt-10 flex justify-end">
-            <Button label="Profile">
+            <Button type="submit" label="Profile">
                 <template #icon>
                     <Icon name="mdi:content-save" />
 
                 </template>
             </Button>
         </div>
-    </div>
+    </Form>
 </template>
