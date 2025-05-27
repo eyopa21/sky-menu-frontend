@@ -1,6 +1,9 @@
 <template>
     <div
         class="p-6 md:p-12 rounded-2.5xl lg:rounded-4xl bg-white/16 backdrop-blur-[48px] max-w-[calc(100%-3rem)] lg:max-w-none mx-auto shadow-[0px_2px_5px_0px_rgba(255,255,255,0.06)_inset,0px_12px_20px_0px_rgba(0,0,0,0.06)]">
+        <div class="pb-10 border-b border-white/12 flex flex-col items-start gap-4">
+            <div class="md:flex-[0.45] flex flex-col gap-1"><span class="text-xl font-medium ">Security</span><span class="text-white/64">Change your password here</span></div>
+        </div>
         <div class="py-10 border-b border-white/12 flex flex-col gap-10">
             <div class="flex flex-col sm:flex-row gap-2 items-center justify-between">
                 <div class=" text-lg  font-medium">Change Password</div>
