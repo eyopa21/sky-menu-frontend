@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia'
 import type { AuthSessionSchema } from '~/types/login'
+import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', () => {
   const redirectTo = useCookie('redirectTo')
@@ -27,8 +27,6 @@ export const useAuthStore = defineStore('auth', () => {
     session.value = candidate
   }
 
-
-
   const setRedirectTarget = (to: string) => {
     redirectTo.value = to
   }
@@ -50,8 +48,6 @@ export const useAuthStore = defineStore('auth', () => {
     clearRedirect()
     return navigateTo('/auth/login')
   }
-
- 
 
   return {
     session,

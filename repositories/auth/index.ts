@@ -1,14 +1,15 @@
-import type { NitroFetchRequest, $Fetch } from "nitropack";
+import type { $Fetch, NitroFetchRequest } from 'nitropack'
 
-import type { AuthSessionSchema, User } from "~/types/login";
-import type { LoginDto } from "./dto/login.dto";
+import type { LoginDto } from './dto/login.dto'
+import type { AuthSessionSchema } from '~/types/login'
 
-export const authRepository =<T> (fetch: $Fetch<T, NitroFetchRequest>) => ({
+export function authRepository<T>(fetch: $Fetch<T, NitroFetchRequest>) {
+  return {
     async login(loginDto: LoginDto): Promise<AuthSessionSchema> {
-        return fetch<AuthSessionSchema>('auth/login', {
-            method: 'POST', 
-            body: loginDto
-        })
-
-    }
-})
+      return fetch<AuthSessionSchema>('auth/login', {
+        method: 'POST',
+        body: loginDto,
+      })
+    },
+  }
+}

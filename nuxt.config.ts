@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
-import Aura from '@primeuix/themes/aura';
+import Aura from '@primeuix/themes/aura'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
@@ -10,27 +10,26 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/eslint',
     '@primevue/nuxt-module',
-    '@nuxtjs/tailwindcss', 
-    '@pinia/nuxt', 
-    'pinia-plugin-persistedstate/nuxt'
-  ], 
+    '@nuxtjs/tailwindcss',
+    '@pinia/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
+  ],
 
   eslint: {
     config: { stylistic: false, standalone: false },
   },
 
-  
   primevue: {
     autoImport: true,
     options: {
-        theme: {
-            preset: Aura
-        }
-    }
-},
+      theme: {
+        preset: Aura,
+      },
+    },
+  },
   runtimeConfig: {
     public: {
-      restApiUrl: process.env.NUXT_PUBLIC_REST_API_URL ,
-    }
-  }
+      restApiUrl: process.env.NUXT_PUBLIC_REST_API_URL,
+    },
+  },
 })

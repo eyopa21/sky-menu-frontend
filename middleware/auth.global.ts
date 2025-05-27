@@ -1,22 +1,20 @@
-import { useAuthStore } from "~/store/auth"
+import { useAuthStore } from '~/store/auth'
 
 export default defineNuxtRouteMiddleware((to, from) => {
-const authStore = useAuthStore()
-const {  isLoggedIn } = storeToRefs(authStore)
+  const authStore = useAuthStore()
+  const { isLoggedIn } = storeToRefs(authStore)
 
-const pageType = to.meta.pageType ?? PageType.AUTHENTICATED
+  const pageType = to.meta.pageType ?? PageType.AUTHENTICATED
 
-console.log({to })
+  console.log({ to })
 
-// if(pageType === PageType.AUTHENTICATED && !$authentication.loggedIn.value ) {
+  // if(pageType === PageType.AUTHENTICATED && !$authentication.loggedIn.value ) {
 
-//  return navigateTo('/auth/login')
-    
-// }
-  
-// if(to.name === 'auth-login' && $authentication.loggedIn.value){
-//     return navigateTo('/')
-// }
+  //  return navigateTo('/auth/login')
 
+  // }
 
+  // if(to.name === 'auth-login' && $authentication.loggedIn.value){
+  //     return navigateTo('/')
+  // }
 })

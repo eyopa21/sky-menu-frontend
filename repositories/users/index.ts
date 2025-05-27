@@ -1,14 +1,15 @@
-import type { NitroFetchRequest, $Fetch } from "nitropack";
+import type { $Fetch, NitroFetchRequest } from 'nitropack'
 
-import type { TUpdateAccountValidationSchema } from "~/zod/AccountUpdate";
-import type { User } from "~/types/login";
+import type { User } from '~/types/login'
+import type { TUpdateAccountValidationSchema } from '~/zod/AccountUpdate'
 
-
-export const userRepository =<T> (fetch: $Fetch<T, NitroFetchRequest>) => ({
+export function userRepository<T>(fetch: $Fetch<T, NitroFetchRequest>) {
+  return {
     async updateMyAccount(userId: number, updateAccountDto: TUpdateAccountValidationSchema): Promise<User> {
-        return fetch<User>(`/users/${userId}`, {
-            method: 'PATCH', 
-            body: updateAccountDto
-        })
-    }
-})
+      return fetch<User>(`/users/${userId}`, {
+        method: 'PATCH',
+        body: updateAccountDto,
+      })
+    },
+  }
+}
