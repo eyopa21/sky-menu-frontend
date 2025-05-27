@@ -15,6 +15,10 @@ export default defineNuxtConfig({
     'pinia-plugin-persistedstate/nuxt'
   ], 
 
+  eslint: {
+    config: { stylistic: false, standalone: false },
+  },
+
   
   primevue: {
     autoImport: true,
