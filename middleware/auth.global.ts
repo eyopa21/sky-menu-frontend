@@ -1,5 +1,8 @@
+import { useAuthStore } from "~/store/auth"
+
 export default defineNuxtRouteMiddleware((to, from) => {
-const  {$authentication} = useNuxtApp()
+const authStore = useAuthStore()
+const {  isLoggedIn } = storeToRefs(authStore)
 
 const pageType = to.meta.pageType ?? PageType.AUTHENTICATED
 

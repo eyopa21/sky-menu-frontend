@@ -6,9 +6,10 @@ import { useToast } from 'primevue/usetoast';
 import { LoginValidationSchema, type TLoginValidationSchema } from '~/zod/LoginValidation';
 import type { FormSubmitEvent } from '@primevue/forms/form';
 import { authRepository } from '~/repositories/auth';
+import { useAuthStore } from '~/store/auth';
 
 const { $api } = useNuxtApp()
-const { $authentication } = useNuxtApp();
+const { updateSession } = useAuthStore()
 const toast = useToast();
 const loading  = ref(false);
 const initialValues = ref({
@@ -27,7 +28,7 @@ const onFormSubmit = async (e: FormSubmitEvent<TLoginValidationSchema>) => {
             loading.value = true;
             const data = await authRepo.login(e.values);
             if (data) {
-                $authentication.updateSession({
+                updateSession({
                     accessToken: data.accessToken,
                     refreshToken: data.refreshToken,
                     user: data.user

@@ -4,13 +4,16 @@ import type { FetchResult, NuxtError } from '#app';
 import type { FormSubmitEvent } from '@primevue/forms/form';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { userRepository } from '~/repositories/users';
+import { useAuthStore } from '~/store/auth';
 import { UpdateAccountValidationSchema, type TUpdateAccountValidationSchema } from '~/zod/AccountUpdate';
 
 
-const { $authentication, $api } = useNuxtApp();
+const {  $api } = useNuxtApp();
+const authStore = useAuthStore()
+const { session } = storeToRefs(authStore)
 const toast = useToast();
 const userRepo = userRepository($api)
-const currentUser = $authentication.session.value?.user
+const currentUser = session.value?.user
 const loading = ref(false);
 const initialValues = ref<Partial<TUpdateAccountValidationSchema>>({
 
@@ -32,9 +35,9 @@ async function onFormSubmit(e: FormSubmitEvent<TUpdateAccountValidationSchema>) 
             const data = await userRepo.updateMyAccount(currentUser?.id, e.values);
             if (data) {
                 console.log('Update successful:', data);
-                $authentication.updateSession({
-                    accessToken: $authentication.session.value?.accessToken!,
-                    refreshToken: $authentication.session.value?.refreshToken!,
+                authStore.updateSession({
+                    accessToken: session.value?.accessToken!,
+                    refreshToken: session.value?.refreshToken!,
                     user: data
                 })
                 toast.add({ severity: 'success', summary: 'Profile updated successfully!', life: 3000 });

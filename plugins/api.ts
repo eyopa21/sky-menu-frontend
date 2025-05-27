@@ -1,17 +1,19 @@
+import { useAuthStore } from "~/store/auth"
+
 export default defineNuxtPlugin({
     name: 'api',
     dependsOn: ['authentication'],
     async setup() {
         const config = useRuntimeConfig()
         const baseURL = config.public.restApiUrl
-        const { $authentication } =  useNuxtApp()
-        const accessToken = $authentication?.accessToken.value
+        const authStore = useAuthStore()
+        const { accessToken } = storeToRefs(authStore)
         const api = $fetch.create({
             baseURL, 
            
             onRequest({ request, options, error }) {
                 if (accessToken) {
-                  options.headers.set('Authorization', `Bearer ${accessToken}`)
+                  options.headers.set('Authorization', `Bearer ${accessToken.value}`)
                 }
               },
 
