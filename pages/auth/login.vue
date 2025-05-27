@@ -10,7 +10,7 @@ import { authRepository } from '~/repositories/auth';
 const { $api } = useNuxtApp()
 const { $authentication } = useNuxtApp();
 const toast = useToast();
-
+const loading  = ref(false);
 const initialValues = ref({
     email: undefined,
     password: undefined
@@ -24,6 +24,7 @@ const authRepo = authRepository($api)
 const onFormSubmit = async (e: FormSubmitEvent<TLoginValidationSchema>) => {
     if (e.valid) {
         try {
+            loading.value = true;
             const data = await authRepo.login(e.values);
             if (data) {
                 $authentication.updateSession({
@@ -37,6 +38,8 @@ const onFormSubmit = async (e: FormSubmitEvent<TLoginValidationSchema>) => {
         } catch (err) {
             console.error('Login error:', err);
             toast.add({ severity: 'error', summary: 'An error occurred.', life: 3000 });
+        } finally {
+            loading.value = false;
         }
     }
 };
@@ -90,7 +93,7 @@ const onFormSubmit = async (e: FormSubmitEvent<TLoginValidationSchema>) => {
                         </ul>
                     </Message>
                 </div>
-                <Button type="submit" label="Sign In"
+                <Button type="submit" label="Sign In" :loading
                     class="!w-full !rounded-3xl !bg-surface-950 !border !border-surface-950 !text-white hover:!bg-surface-950/80" />
             </Form>
             <a class="text-white/80 cursor-pointer hover:text-white/90">Forgot Password?</a>

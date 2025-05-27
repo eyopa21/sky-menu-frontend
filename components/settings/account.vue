@@ -11,12 +11,12 @@ const { $authentication, $api } = useNuxtApp();
 const toast = useToast();
 const userRepo = userRepository($api)
 const currentUser = $authentication.session.value?.user
-
-const initialValues = ref({
+const loading = ref(false);
+const initialValues = ref<Partial<TUpdateAccountValidationSchema>>({
 
     full_name: currentUser?.full_name,
-    phone_number: currentUser?.phone_number, 
-    birth_date: currentUser?.date_of_birth, 
+    phone_number: currentUser?.phone_number,
+    date_of_birth: currentUser?.date_of_birth,
     sex: currentUser?.sex
 
 });
@@ -28,11 +28,12 @@ const resolver = zodResolver(
 async function onFormSubmit(e: FormSubmitEvent<TUpdateAccountValidationSchema>) {
     if (e.valid && currentUser?.id) {
         try {
+            loading.value = true;
             const data = await userRepo.updateMyAccount(currentUser?.id, e.values);
             if (data) {
                 console.log('Update successful:', data);
                 $authentication.updateSession({
-                    accessToken: $authentication.session.value?.accessToken!, 
+                    accessToken: $authentication.session.value?.accessToken!,
                     refreshToken: $authentication.session.value?.refreshToken!,
                     user: data
                 })
@@ -41,6 +42,8 @@ async function onFormSubmit(e: FormSubmitEvent<TUpdateAccountValidationSchema>) 
         } catch (err: unknown) {
             console.log('Update error:', err);
             toast.add({ severity: 'error', summary: err!.message || 'An error occurred while updating profile.', life: 3000 });
+        } finally {
+            loading.value = false;
         }
     }
 }
@@ -52,7 +55,7 @@ async function onFormSubmit(e: FormSubmitEvent<TUpdateAccountValidationSchema>) 
         class="p-6 md:p-12 rounded-2.5xl lg:rounded-4xl bg-white/16 backdrop-blur-[48px] max-w-[calc(100%-3rem)] lg:max-w-none mx-auto shadow-[0px_2px_5px_0px_rgba(255,255,255,0.06)_inset,0px_12px_20px_0px_rgba(0,0,0,0.06)]">
         <div class="pb-10 border-b border-white/12 flex flex-col items-start gap-4">
             <div class="md:flex-[0.45] flex flex-col gap-1"><span class="text-xl font-medium ">Your
-                    Photo</span><span class="text-white/64">This
+                    Account</span><span class="text-white/64">This
                     will be displayed on your profile.</span></div>
             <!-- <div class="md:flex-[0.55] flex items-center gap-4  w-full">
                  <AppFileUploader @file-uploaded="" />
@@ -68,7 +71,7 @@ async function onFormSubmit(e: FormSubmitEvent<TUpdateAccountValidationSchema>) 
                     <InputText name="full_name" size="large"
                         class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm"
                         placeholder="Full name" />
-                <Message v-if="$form.full_name?.invalid" severity="error" size="small" variant="simple">{{
+                    <Message v-if="$form.full_name?.invalid" severity="error" size="small" variant="simple">{{
                         $form.full_name.error.message }}</Message>
                 </IconField>
             </div>
@@ -78,11 +81,11 @@ async function onFormSubmit(e: FormSubmitEvent<TUpdateAccountValidationSchema>) 
                     <InputIcon>
                         <Icon name="mdi:phone" class="!text-white/70" />
                     </InputIcon>
-                    <InputText  name="phone_number" size="large"
+                    <InputText name="phone_number" size="large"
                         class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm"
                         placeholder="Phone number" />
-                        
-                <Message v-if="$form.phone_number?.invalid" severity="error" size="small" variant="simple">{{
+
+                    <Message v-if="$form.phone_number?.invalid" severity="error" size="small" variant="simple">{{
                         $form.phone_number.error.message }}</Message>
                 </IconField>
             </div>
@@ -92,23 +95,19 @@ async function onFormSubmit(e: FormSubmitEvent<TUpdateAccountValidationSchema>) 
                     <InputIcon>
                         <Icon name="mdi:calendar" class="!text-white/70" />
                     </InputIcon>
-                    <!-- <InputText  name="date_of_birth" size="large"
-                        class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm"
-                        placeholder="Date of birth" /> -->
-                        <DatePicker name="date_of_birth" showIcon fluid iconDisplay="input" />
-                <Message v-if="$form.date_of_birth?.invalid" severity="error" size="small" variant="simple">{{
+    
+                    <DatePicker v-model="initialValues.date_of_birth" name="date_of_birth" showIcon  fluid iconDisplay="input" input-class="!appearance-none !border !border-white/10 !w-full !outline-0 !bg-white/10 !text-white placeholder:!text-white/70 !rounded-3xl !shadow-sm" />
+                    <Message v-if="$form.date_of_birth?.invalid" severity="error" size="small" variant="simple">{{
                         $form.date_of_birth.error.message }}</Message>
                 </IconField>
             </div>
 
             <div class="flex flex-col justify-between sm:flex-row gap-2 items-center">
                 <div class=" text-lg  font-medium">Gender</div>
-               
-                   
-                    <SelectButton name="sex"  :options="['male', 'female']" size="large" />
+                <SelectButton name="sex" :options="['male', 'female']" size="large"  class="!rounded-full bg-red-500"  />
                 <Message v-if="$form.sex?.invalid" severity="error" size="small" variant="simple">{{
-                        $form.sex.error.message }}</Message>
-               
+                    $form.sex.error.message }}</Message>
+
             </div>
 
 
@@ -125,13 +124,12 @@ async function onFormSubmit(e: FormSubmitEvent<TUpdateAccountValidationSchema>) 
                         placeholder="Email address" />
                 </IconField>
             </div>
-            
+
         </div>
         <div class="pt-10 flex justify-end">
-            <Button type="submit" label="Profile">
+            <Button type="submit" label="Save" :loading>
                 <template #icon>
                     <Icon name="mdi:content-save" />
-
                 </template>
             </Button>
         </div>

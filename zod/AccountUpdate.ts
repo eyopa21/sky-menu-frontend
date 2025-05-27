@@ -25,7 +25,7 @@ export const UpdateAccountValidationSchema = z.object({
           return { message: 'Please select your Gender' }
         },
       }),
-      date_of_birth: z.coerce.date({
+      date_of_birth: z.date({
         required_error: 'Please Enter Date of Birth',
         invalid_type_error: 'That\'s not a date!',
       }).min(new Date('1900-01-01'), { message: 'Unfortunately, you exceed the maximum age limit for this service.' }).max(new Date('2010-01-01'), { message: 'You must be at least 14 years old to proceed.' }),
