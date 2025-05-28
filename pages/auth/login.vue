@@ -9,6 +9,10 @@ import { authRepository } from '~/repositories/auth'
 import { useAuthStore } from '~/store/auth'
 import { LoginValidationSchema } from '~/zod/LoginValidation'
 
+definePageMeta({
+  layout: 'auth',
+})
+
 const { $api } = useNuxtApp()
 const { updateSession } = useAuthStore()
 const toast = useToast()

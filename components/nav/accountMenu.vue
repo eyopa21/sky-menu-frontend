@@ -61,15 +61,11 @@ const authRepo = authRepository($api)
 async function logout() {
   try {
     loading.value = true
-    const data = await authRepo.logout({
+    await authRepo.logout({
       accessToken: session.value!.accessToken,
       refreshToken: session.value!.refreshToken,
     })
-
     authStore.logout()
-
-    console.log({ data })
-
     navigateTo('auth/login')
     toast.add({ severity: 'success', summary: 'Logout successful!', life: 3000 })
   } catch (err) {
@@ -91,10 +87,14 @@ function toggle(event: Event) {
 
   <Menu ref="accountMenu" :model="accountItems" class="w-full md:w-60" popup>
     <template #start>
-      <span class="inline-flex items-center gap-1 p-2">
-
-        <span class="text-xl font-semibold">SKY<span class="text-primary">APP</span></span>
-      </span>
+      <div class="flex flex-col items-end gap-1 p-2">
+        <div class="text-xl font-semibold">
+          SKY<span class="text-primary">APP</span>
+        </div>
+        <div class="text-gray-300">
+          Logged in as: {{ session?.user.full_name }}
+        </div>
+      </div>
     </template>
     <template #submenulabel="{ item }">
       <span class="font-bold text-primary">{{ item.label }}</span>

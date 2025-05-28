@@ -27,6 +27,12 @@ export const useAuthStore = defineStore('auth', () => {
     session.value = candidate
   }
 
+  const currentUser = () => {
+    if (isLoggedIn.value) {
+      return session.value?.user
+    }
+  }
+
   const setRedirectTarget = (to: string) => {
     redirectTo.value = to
   }
@@ -51,6 +57,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     session,
+    currentUser,
     isLoggedIn,
     redirectTo,
     updateSession,
