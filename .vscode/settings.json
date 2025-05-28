@@ -6,7 +6,8 @@
     "editor.defaultFormatter": "Vue.volar"
   },
   "cSpell.words": [
-    "Nuxt"
+    "Nuxt",
+    "primevue"
   ],
   // Set css custom data to handle tailwind directives
   "css.customData": [
