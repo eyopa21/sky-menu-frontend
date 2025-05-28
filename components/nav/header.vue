@@ -1,13 +1,17 @@
 <script setup lang="ts">
+import type { MenuItem } from 'primevue/menuitem'
 import { useAuthStore } from '~/store/auth'
 
 const authStore = useAuthStore()
 const { isLoggedIn } = storeToRefs(authStore)
 
-const items = ref([
+const items = ref<MenuItem>([
   {
     label: 'Home',
     icon: 'pi pi-home',
+    command: () => {
+      navigateTo('/')
+    },
   },
   {
     label: 'Projects',
