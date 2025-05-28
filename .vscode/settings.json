@@ -1,0 +1,96 @@
+{
+  "[graphql]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "Vue.volar"
+  },
+  "cSpell.words": [
+    "Nuxt"
+  ],
+  // Set css custom data to handle tailwind directives
+  "css.customData": [
+    ".vscode/tailwindcss.json"
+  ],
+  // Auto fix
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+  "editor.defaultFormatter": null,
+  // Disable the default formatter, use eslint instead
+  "editor.formatOnSave": false,
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "eslint.ignoreUntitled": true,
+  // Silent the stylistic rules in you IDE, but still auto fix them
+  "eslint.rules.customizations": [
+    {
+      "rule": "style/*",
+      "severity": "off"
+    },
+    {
+      "rule": "*-indent",
+      "severity": "off"
+    },
+    {
+      "rule": "*-spacing",
+      "severity": "off"
+    },
+    {
+      "rule": "*-spaces",
+      "severity": "off"
+    },
+    {
+      "rule": "*-order",
+      "severity": "off"
+    },
+    {
+      "rule": "*-dangle",
+      "severity": "off"
+    },
+    {
+      "rule": "*-newline",
+      "severity": "off"
+    },
+    {
+      "rule": "*semi",
+      "severity": "off"
+    }
+  ],
+  "eslint.runtime": "node",
+  // Enable eslint for all supported languages
+  "eslint.validate": [
+    "github-actions-workflow",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "vue",
+    "html",
+    "markdown",
+    "json",
+    "jsonc",
+    "yaml"
+  ],
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "npm.packageManager": "pnpm",
+  "prettier.enable": true,
+  "tailwindCSS.codeActions": true,
+  "tailwindCSS.experimental.configFile": ".nuxt/tailwind/postcss.mjs",
+  "tailwindCSS.experimental.classRegex": [
+    [
+      "cva\\(([^)]*)\\)",
+      "[\"'`]([^\"'`]*).*?[\"'`]"
+    ],
+    [
+      "cx\\(([^)]*)\\)",
+      "(?:'|\"|`)([^']*)(?:'|\"|`)"
+    ]
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "tailwindCSS.emmetCompletions": true
+}

@@ -1,0 +1,22 @@
+{
+  "Typescript script setup": {
+    "scope": "vue",
+    "prefix": [
+      "s:s:t",
+      "script:s:t",
+      "script:st"
+    ],
+    "body": [
+      "<script setup lang=\"ts\">",
+      "\t$0",
+      "</script>"
+    ],
+    "description": "Vuejs script setup in Typescript"
+  },
+  "Scoped style": {
+    "scope": "vue",
+    "prefix": ["s:scoped", "style:scoped"],
+    "body": [ "<style scoped />", "\t$0", "</style>"],
+    "description": "Vuejs style block scoped to the single file"
+  }
+}
