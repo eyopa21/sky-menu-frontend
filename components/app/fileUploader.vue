@@ -1,43 +1,25 @@
 <script setup lang="ts">
 import type { FileUploadUploaderEvent } from 'primevue/fileupload'
 
-import { useToast } from 'primevue/usetoast'
-import { commonRepository } from '~/repositories/common'
+const theFile = defineModel<File>(undefined)
 
-const emit = defineEmits<{
-  fileUploaded: [string]
-}>()
-const { $api } = useNuxtApp()
-const toast = useToast()
-
-const commonRepo = commonRepository($api)
 async function onAdvancedUpload(value: FileUploadUploaderEvent) {
+  console.log('selected')
   const file: File | File[] = value.files
-  const formData = new FormData()
   if (Array.isArray(file)) {
-    formData.append('file', file[0])
+    theFile.value = file[0]
   } else {
-    formData.append('file', file)
-  }
-  try {
-    const data = await commonRepo.uploadSingleFile(formData)
-    if (data) {
-      console.log('File uploaded successfully:', data)
-      emit('fileUploaded', data.url)
-    }
-  } catch (err) {
-    console.log(err)
-    toast.add({ severity: 'error', summary: 'An error occurred.', life: 3000 })
+    theFile.value = file
   }
 }
 </script>
 
 <template>
   <div class="card w-full">
-    <Toast />
+    {{ theFile }}
     <FileUpload
-      :multiple="false" accept="image/*" custom-upload :max-file-size="1000000" upload-label="Update"
-      @uploader="onAdvancedUpload"
+      :multiple="false" accept="image/*" :max-file-size="1000000" upload-label="Update"
+      @select="onAdvancedUpload"
     />
   </div>
 </template>
