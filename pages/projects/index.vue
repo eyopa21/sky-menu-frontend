@@ -61,8 +61,11 @@ if (error.value) {
 <template>
   <div>
     <div class="card">
-      <div class="text-xl font-semibold">
-        DataView
+      <div class="flex justify-between p-4 px-0">
+        <div class="text-xl font-semibold">
+          DataView
+        </div>
+        <DashboardProjectsNewProject />
       </div>
       {{ projects }}
       <DataView :value="products" :layout="layout">

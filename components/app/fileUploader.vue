@@ -16,7 +16,6 @@ async function onAdvancedUpload(value: FileUploadUploaderEvent) {
 
 <template>
   <div class="card w-full">
-    {{ theFile }}
     <FileUpload
       :multiple="false" accept="image/*" :max-file-size="1000000" upload-label="Update"
       @select="onAdvancedUpload"
