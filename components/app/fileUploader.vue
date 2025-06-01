@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { FileUploadUploaderEvent } from 'primevue/fileupload'
 
+const props = defineProps<{
+  name: string
+}>()
+
 const theFile = defineModel<File>(undefined)
 
 async function onAdvancedUpload(value: FileUploadUploaderEvent) {
@@ -17,7 +21,7 @@ async function onAdvancedUpload(value: FileUploadUploaderEvent) {
 <template>
   <div class="card w-full">
     <FileUpload
-      :multiple="false" accept="image/*" :max-file-size="1000000" upload-label="Update"
+      :multiple="false" accept="image/*" :name="props.name" :max-file-size="1000000" upload-label="Update"
       @select="onAdvancedUpload"
     />
   </div>
