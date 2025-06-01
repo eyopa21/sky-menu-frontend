@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from '@primevue/forms/form'
-import type { TLoginValidationSchema } from '~/zod/LoginValidation'
 
 import type { TCreateProjectValidationSchema } from '~/zod/projects/CreateProjectValidation'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { useToast } from 'primevue/usetoast'
 import { ref } from 'vue'
-import { authRepository } from '~/repositories/auth'
-import { useAuthStore } from '~/store/auth'
+import { projectsRepository } from '~/repositories/projects'
 import { CreateProjectValidationSchema } from '~/zod/projects/CreateProjectValidation'
 
 definePageMeta({
@@ -15,11 +13,11 @@ definePageMeta({
 })
 
 const { $api } = useNuxtApp()
-const { updateSession } = useAuthStore()
+const { uploadFile } = useFileUploader()
 const toast = useToast()
 const loading = ref(false)
 const initialValues = ref<Partial<TCreateProjectValidationSchema>>({
-  title: undefined,
+  title: 'hello',
   description: undefined,
   logo: undefined,
   coverImage: undefined,
@@ -30,23 +28,44 @@ const resolver = zodResolver(
   CreateProjectValidationSchema,
 )
 
-const authRepo = authRepository($api)
+const projectRepo = projectsRepository($api)
 async function onFormSubmit(e: FormSubmitEvent<TCreateProjectValidationSchema>) {
   if (e.valid) {
+    console.log(e.values)
+
     try {
       loading.value = true
-      const data = await authRepo.login(e.v)
-      if (data) {
-        updateSession({
-          accessToken: data.accessToken,
-          refreshToken: data.refreshToken,
-          user: data.user,
+
+      console.log(e)
+      const results = await Promise.allSettled([
+        uploadFile(e.values.logo!),
+        uploadFile(e.values.coverImage!),
+      ])
+
+      console.log(results)
+      const [logoUpload, coverImageUpload] = results
+
+      if (logoUpload.status === 'rejected' || coverImageUpload.status === 'rejected') {
+        throw new Error('One or more of your image uploads failed', {
+          cause: {
+            results,
+            uploadType: 'manager',
+          },
         })
-        navigateTo('/')
-        toast.add({ severity: 'success', summary: 'Login successful!', life: 3000 })
+      }
+
+      const data = await projectRepo.createProject({
+        description: e.values.description,
+        title: e.values.title,
+        logo: logoUpload.value!,
+        coverImage: coverImageUpload.value,
+      })
+      if (data) {
+        visible.value = false
+        toast.add({ severity: 'success', summary: 'Project created successfully!', life: 3000 })
       }
     } catch (err) {
-      console.error('Login error:', err)
+      console.error('Create project:', err)
       toast.add({ severity: 'error', summary: 'An error occurred.', life: 3000 })
     } finally {
       loading.value = false
@@ -68,7 +87,8 @@ async function onFormSubmit(e: FormSubmitEvent<TCreateProjectValidationSchema>) 
       >
         <div class="flex w-full flex-col gap-6 p-4">
           <div class="flex flex-col gap-2">
-            <label for="name1">Title</label>
+            <label>Title</label>
+            {{ initialValues }}
             <div>
               <IconField>
                 <InputIcon>
@@ -86,7 +106,7 @@ async function onFormSubmit(e: FormSubmitEvent<TCreateProjectValidationSchema>) 
             </div>
           </div>
           <div class="flex flex-col gap-2">
-            <label for="name1">Description</label>
+            <label>Description</label>
             <div>
               <Textarea
                 name="description" rows="5" cols="30"
@@ -101,28 +121,26 @@ async function onFormSubmit(e: FormSubmitEvent<TCreateProjectValidationSchema>) 
               </Message>
             </div>
           </div>
-          <div class="flex flex-col gap-2">
+          <!-- <div class="flex flex-col gap-2">
             <label for="name1">Logo</label>
-            <div>
-              <FormField v-slot="$field" name="logo" :initial-value="initialValues.logo" class="flex flex-col gap-1">
-                <AppFileUploader v-model="initialValues.logo" name="logo" />
-                <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
-                  {{ $field.error?.message }}
-                </Message>
-              </FormField>
+            <div class="flex flex-col gap-1">
+              <AppFileUploader v-model="initialValues.logo" name="logo" />
+              <Message v-if="$form?.logo?.invalid" severity="error" size="small" variant="simple">
+                {{ $form.logo?.error?.message }}
+              </Message>
             </div>
           </div>
           <div class="flex flex-col gap-2">
             <label for="name1">Cover Picture</label>
             <div>
-              <FormField v-slot="$field" name="coverImage" :initial-value="initialValues.coverImage" class="flex flex-col gap-1">
-                <AppFileUploader v-model="initialValues.coverImage" />
-                <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
-                  {{ $field.error?.message }}
+              <div class="flex flex-col gap-1">
+                <AppFileUploader v-model="initialValues.coverImage" name="coverImage" />
+                <Message v-if="$form.coverImage?.invalid" severity="error" size="small" variant="simple">
+                  {{ $form.coverImage?.error?.message }}
                 </Message>
-              </FormField>
+              </div>
             </div>
-          </div>
+          </div> -->
         </div>
         <Button
           type="submit" label="Sign In" :loading
