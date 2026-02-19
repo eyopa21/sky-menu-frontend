@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { NuxtError } from '#app'
 import { ref, reactive } from 'vue'
 import { authRepository } from '~/repositories/auth'
 import { useAuthStore } from '~/store/auth'
@@ -49,73 +48,64 @@ async function onSubmit(event: { data: TLoginValidationSchema }) {
 </script>
 
 <template>
-  <div
-    class="flex min-h-screen items-center justify-center bg-cover bg-center bg-no-repeat px-8 py-20 backdrop-blur-3xl md:px-12 lg:px-20"
-    style="background-image: url('https://fqjltiegiezfetthbags.supabase.co/storage/v1/object/public/block.images/blocks/signin/signin-glass.jpg')"
-  >
-    <div
-      class="flex w-full max-w-xl flex-col items-center gap-12 rounded-2xl border border-white/10 bg-white/10 px-8 py-12 backdrop-blur-2xl md:px-12 lg:px-20"
+  <div class="space-y-6">
+    <div class="space-y-2">
+      <h1 class="text-3xl font-bold tracking-tight">Welcome back</h1>
+      <p class="text-gray-400">
+        Enter your credentials to access your account.
+      </p>
+    </div>
+
+    <UForm
+      :schema="LoginValidationSchema"
+      :state="state"
+      class="space-y-6"
+      @submit="onSubmit"
     >
-      <div class="flex w-full flex-col items-center gap-4">
-        <UIcon name="i-heroicons-cloud-arrow-up" class="size-14 text-white" />
-        <div class="flex w-full flex-col gap-2">
-          <div class="text-center text-3xl font-medium leading-tight text-white">
-            Welcome Back
-          </div>
-          <div class="text-center">
-            <span class="text-white/80">Don't have an account? </span>
-            <NuxtLink to="/auth/signup" class="cursor-pointer text-white/80 underline hover:text-white/90">Sign up</NuxtLink>
-          </div>
-        </div>
-      </div>
-
-      <UForm
-        :schema="LoginValidationSchema"
-        :state="state"
-        class="flex w-full flex-col items-center gap-8"
-        @submit="onSubmit"
-      >
-        <div class="flex w-full flex-col gap-6">
-          <UFormField name="email" class="w-full">
-            <UInput
-              v-model="state.email"
-              icon="i-heroicons-envelope"
-              size="xl"
-              placeholder="Email"
-              class="w-full"
-              :ui="{ 
-                base: 'rounded-3xl border-white/10 bg-white/10 text-white placeholder-white/70 focus:ring-white/20',
-                inline: 'pl-12'
-              }"
-            />
-          </UFormField>
-
-          <UFormField name="password" class="w-full">
-            <UInput
-              v-model="state.password"
-              type="password"
-              icon="i-heroicons-lock-closed"
-              size="xl"
-              placeholder="Password"
-              class="w-full"
-              :ui="{ 
-                base: 'rounded-3xl border-white/10 bg-white/10 text-white placeholder-white/70 focus:ring-white/20',
-                inline: 'pl-12'
-              }"
-            />
-          </UFormField>
-        </div>
-
-        <UButton
-          type="submit"
-          label="Sign In"
-          :loading="loading"
+      <UFormField label="Email" name="email">
+        <UInput
+          v-model="state.email"
+          icon="i-heroicons-envelope"
           size="xl"
-          block
-          class="rounded-3xl bg-white text-black hover:bg-white/90"
+          placeholder="name@example.com"
+          class="w-full"
+          :ui="{ base: 'bg-white/5 border-white/10 focus:ring-emerald-500/50' }"
         />
-      </UForm>
-      <NuxtLink to="/auth/forgot-password" class="cursor-pointer text-white/80 hover:text-white/90">Forgot Password?</NuxtLink>
+      </UFormField>
+
+      <UFormField label="Password" name="password">
+        <template #label>
+            <div class="flex items-center justify-between w-full">
+                <span>Password</span>
+                <NuxtLink to="/auth/forgot-password" class="text-sm text-emerald-400 hover:text-emerald-300">Forgot password?</NuxtLink>
+            </div>
+        </template>
+        <UInput
+          v-model="state.password"
+          type="password"
+          icon="i-heroicons-lock-closed"
+          size="xl"
+          placeholder="••••••••"
+          class="w-full"
+          :ui="{ base: 'bg-white/5 border-white/10 focus:ring-emerald-500/50' }"
+        />
+      </UFormField>
+
+      <UButton
+        type="submit"
+        label="Sign In"
+        :loading="loading"
+        size="xl"
+        block
+        class="bg-emerald-500 text-black hover:bg-emerald-400 font-bold"
+      />
+    </UForm>
+
+    <div class="pt-6 border-t border-white/5 text-center">
+      <p class="text-sm text-gray-500">
+        Don't have an account? 
+        <NuxtLink to="/auth/signup" class="text-emerald-400 hover:text-emerald-300 font-medium">Create one now</NuxtLink>
+      </p>
     </div>
   </div>
 </template>
