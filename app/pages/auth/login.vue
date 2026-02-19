@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { NuxtError } from '#app'
 import { ref, reactive } from 'vue'
 import { authRepository } from '~/repositories/auth'
 import { useAuthStore } from '~/store/auth'
@@ -33,9 +34,14 @@ async function onSubmit(event: { data: TLoginValidationSchema }) {
       navigateTo('/')
       toast.add({ title: 'Login successful!', color: 'success' })
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Login error:', err)
-    toast.add({ title: 'An error occurred.', description: 'Please check your credentials.', color: 'error' })
+    const description = getErrorMessage(err)
+    toast.add({ 
+      title: 'Login failed', 
+      description, 
+      color: 'error' 
+    })
   } finally {
     loading.value = false
   }
