@@ -1,35 +1,90 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
-import Aura from '@primeuix/themes/aura'
-
 export default defineNuxtConfig({
-  compatibilityDate: '2025-05-15',
+
   devtools: { enabled: true },
   modules: [
     '@nuxt/image',
     '@nuxt/icon',
     '@nuxt/eslint',
-    '@primevue/nuxt-module',
-    '@nuxtjs/tailwindcss',
+    '@nuxt/ui',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
   ],
 
-  eslint: {
-    config: { stylistic: false, standalone: false },
+  // runtimeConfig: {
+  //   public: {
+  //     apiBase: 'http://localhost:3000'
+  //   }
+  // },
+
+
+
+  css: ['~/assets/css/tailwind.css'],
+
+  routeRules: {
+    '/': { prerender: true }
   },
 
-  primevue: {
-    autoImport: true,
-    options: {
-      theme: {
-        preset: Aura,
-      },
-    },
+  compatibilityDate: '2025-01-15',
+
+  eslint: {
+    config: {
+      stylistic: {
+        commaDangle: 'never',
+        braceStyle: '1tbs'
+      }
+    }
   },
+
+
+
+
   runtimeConfig: {
     public: {
       restApiUrl: process.env.NUXT_PUBLIC_REST_API_URL,
     },
   },
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -13,25 +13,22 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@antfu/eslint-config": "^4.13.2",
-    "@nuxt/eslint": "1.4.1",
-    "@nuxt/icon": "1.13.0",
-    "@nuxt/image": "1.10.0",
-    "@nuxtjs/tailwindcss": "6.14.0",
-    "@pinia/nuxt": "^0.11.0",
-    "@primeuix/themes": "^1.1.1",
-    "@primevue/forms": "^4.3.4",
-    "@primevue/nuxt-module": "4.3.4",
-    "eslint": "^9.27.0",
-    "eslint-plugin-tailwindcss": "^3.18.0",
-    "nuxt": "^3.17.4",
-    "pinia": "^3.0.2",
-    "pinia-plugin-persistedstate": "^4.3.0",
-    "primevue": "^4.3.4",
-    "tailwindcss-primeui": "^0.6.1",
-    "typescript": "^5.8.3",
-    "vue": "^3.5.14",
-    "vue-router": "^4.5.1",
-    "zod": "^3.25.23"
+    "@antfu/eslint-config": "^7.4.3",
+    "@nuxt/eslint": "1.15.1",
+    "@nuxt/icon": "2.2.1",
+    "@nuxt/image": "2.0.0",
+    "@pinia/nuxt": "^0.11.3",
+    "eslint": "^10.0.0",
+    "pinia": "^3.0.4",
+    "pinia-plugin-persistedstate": "^4.7.1",
+    "typescript": "^5.9.3",
+    "vue": "^3.5.28",
+    "vue-router": "^5.0.2",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@nuxt/ui": "^4.4.0",
+    "nuxt": "^4.3.1",
+    "tailwindcss": "^4.2.0"
   }
 }
