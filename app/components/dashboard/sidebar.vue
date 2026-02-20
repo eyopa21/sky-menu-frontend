@@ -126,17 +126,20 @@ function toggleSection(index: number) {
 
       <div class="mt-auto p-4">
         <USeparator class="mb-4 opacity-20" />
-        <div class="flex items-center gap-3 rounded-lg p-3 text-white hover:bg-white/5 cursor-pointer transition-colors">
+        <NuxtLink 
+          to="/account/settings"
+          class="flex items-center gap-3 rounded-lg p-3 text-white hover:bg-white/5 cursor-pointer transition-colors"
+        >
           <UAvatar
-            src="https://fqjltiegiezfetthbags.supabase.co/storage/v1/object/public/block.images/blocks/avatars/amyelsner.png"
-            alt="Amy Elsner"
+            :src="currentUser?.avatar || 'https://fqjltiegiezfetthbags.supabase.co/storage/v1/object/public/block.images/blocks/avatars/amyelsner.png'"
+            :alt="currentUser?.full_name || 'User'"
             size="md"
           />
-          <div class="flex flex-col">
-            <span class="text-sm font-bold">Amy Elsner</span>
-            <span class="text-xs text-gray-500 text-truncate">amy@example.com</span>
+          <div class="flex flex-col min-w-0">
+            <span class="text-sm font-bold truncate">{{ currentUser?.full_name || 'User' }}</span>
+            <span class="text-xs text-gray-500 truncate">{{ currentUser?.email || 'No email' }}</span>
           </div>
-        </div>
+        </NuxtLink>
       </div>
     </div>
   </div>

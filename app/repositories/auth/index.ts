@@ -5,6 +5,7 @@ import type { LogoutDto } from './dto/logout.dto'
 import type { SignupDto } from './dto/signup.dto'
 import type { ForgotPasswordDto } from './dto/forgot-password.dto'
 import type { ResetPasswordDto } from './dto/reset-password.dto'
+import type { ChangePasswordDto } from './dto/change-password.dto'
 import type { AuthSessionSchema } from '~/types/login'
 
 export function authRepository<T>(fetch: $Fetch<T, NitroFetchRequest>) {
@@ -37,6 +38,12 @@ export function authRepository<T>(fetch: $Fetch<T, NitroFetchRequest>) {
       return fetch<{ message: string }>('auth/reset-password', {
         method: 'POST',
         body: resetPasswordDto,
+      })
+    },
+    async changePassword(changePasswordDto: ChangePasswordDto): Promise<{ message: string }> {
+      return fetch<{ message: string }>('auth/change-password', {
+        method: 'PATCH',
+        body: changePasswordDto,
       })
     },
   }
