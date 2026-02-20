@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { fileTypeRefinement, fileSizeRefinement } from '~/utils/fileRefinements'
 
 export const ACCEPTED_MIME_TYPES = {
   scannedDocument: [
@@ -16,10 +17,10 @@ const MAX_FILE_SIZE = 10000000
 
 export const CreateProjectValidationSchema = z.object({
   title: z.string({
-    required_error: 'Title is required.',
+    error: 'Title is required.',
   }).min(3, { message: 'Minimum 3 characters.' }).max(15, { message: 'Maximum 15 characters.' }),
   description: z
-    .string({ required_error: 'Description is required' })
+    .string({ error: 'Description is required' })
     .min(10, 'Minimum of 10 chars is required'),
   //   logo: z.string().url({
   //     message: 'Invalid logo url',

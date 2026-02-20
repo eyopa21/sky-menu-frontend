@@ -6,7 +6,8 @@ const props = defineProps<{
 const theFile = defineModel<File | undefined>()
 
 function onFileChange(event: any) {
-  const file = event?.[0]
+  const files = event instanceof Event ? (event.target as HTMLInputElement).files : event
+  const file = files?.[0]
   if (file) {
     theFile.value = file
   }

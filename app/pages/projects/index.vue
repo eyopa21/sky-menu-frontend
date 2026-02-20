@@ -8,46 +8,21 @@ definePageMeta({
 const layout = ref<'grid' | 'list'>('grid')
 
 // Mock data preserved from original for UI demonstration
-const products = ref([
-  {
-    id: '1000',
-    name: 'Gourmet Burger',
-    description: 'Fresh beef patty with secret sauce',
-    category: 'Main Course',
-    price: 15.99,
-    rating: 4.8,
-    status: 'In Stock',
-  },
-  {
-    id: '1001',
-    name: 'Classic Pizza',
-    description: 'Hand-tossed dough with premium toppings',
-    category: 'Pizza',
-    price: 12.50,
-    rating: 4.5,
-    status: 'In Stock',
-  },
-  {
-    id: '1002',
-    name: 'Pasta Carbonara',
-    description: 'Creamy sauce with authentic Italian pancetta',
-    category: 'Pasta',
-    price: 14.00,
-    rating: 4.2,
-    status: 'Low Stock',
-  },
-])
-
 const { $api } = useNuxtApp()
 const projectsRepo = projectsRepository($api)
+const toast = useToast()
 
-const { data: projects, status } = await useAsyncData('projects', () => projectsRepo.getMyProjects())
+const { data: projects, status, refresh } = await useAsyncData('projects', () => projectsRepo.getMyProjects())
 
-const items = computed(() => {
-  // If we have real projects, we could map them here. 
-  // For now, using the products array to showcase the UI migration.
-  return products.value
-})
+const deleteProject = async (id: number) => {
+  try {
+    await projectsRepo.deleteProject(id)
+    toast.add({ title: 'Project deleted', color: 'success' })
+    refresh()
+  } catch (err) {
+    toast.add({ title: 'Failed to delete project', color: 'error' })
+  }
+}
 </script>
 
 <template>
@@ -84,46 +59,50 @@ const items = computed(() => {
     </div>
 
     <!-- Grid Layout -->
-    <div v-else-if="layout === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div v-else-if="layout === 'grid' && projects?.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <UCard
-        v-for="item in items"
-        :key="item.id"
+        v-for="project in projects"
+        :key="project.id"
         class="overflow-hidden bg-white/5 border-white/10 hover:border-emerald-500/50 transition-colors group cursor-pointer"
         :ui="{ body: { padding: 'p-0' } }"
+        @click="navigateTo(`/projects/${project.id}`)"
       >
         <template #header>
-          <div class="relative h-48 w-full bg-zinc-900 flex items-center justify-center">
-            <UIcon name="i-heroicons-photo" class="size-12 text-gray-700" />
-            <UBadge
-              :label="item.category"
-              color="emerald"
-              variant="subtle"
-              class="absolute top-4 left-4"
-            />
+          <div class="relative h-48 w-full bg-zinc-900 flex items-center justify-center overflow-hidden">
+            <img v-if="project.coverImage" :src="project.coverImage" class="h-full w-full object-cover" />
+            <UIcon v-else name="i-heroicons-photo" class="size-12 text-gray-700" />
+            <div class="absolute top-4 left-4 flex gap-2">
+              <UBadge
+                :label="project.isPublished ? 'Published' : 'Draft'"
+                :color="project.isPublished ? 'success' : 'warning'"
+                variant="subtle"
+              />
+            </div>
           </div>
         </template>
         
         <div class="p-5 space-y-4">
           <div class="flex items-start justify-between">
-            <div>
-              <h3 class="font-bold text-lg text-white group-hover:text-emerald-400 transition-colors">
-                {{ item.name }}
-              </h3>
-              <p class="text-sm text-gray-400 line-clamp-2 mt-1">
-                {{ item.description }}
-              </p>
-            </div>
-            <div class="flex items-center gap-1 text-yellow-500 font-medium">
-              <UIcon name="i-heroicons-star-solid" class="size-4" />
-              <span class="text-sm">{{ item.rating }}</span>
+            <div class="flex gap-3">
+              <div v-if="project.logo" class="size-10 rounded-lg overflow-hidden shrink-0 border border-white/10">
+                <img :src="project.logo" class="size-full object-cover" />
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-white group-hover:text-emerald-400 transition-colors">
+                  {{ project.title }}
+                </h3>
+                <p class="text-sm text-gray-400 line-clamp-1 mt-1">
+                  {{ project.description }}
+                </p>
+              </div>
             </div>
           </div>
 
           <div class="flex items-center justify-between pt-2">
-            <span class="text-xl font-bold text-white">${{ item.price }}</span>
+            <span class="text-sm font-medium text-gray-400">{{ project.currency }}</span>
             <div class="flex items-center gap-2">
-              <UButton icon="i-heroicons-heart" variant="ghost" color="neutral" size="sm" />
-              <UButton label="Customize" color="emerald" size="sm" />
+              <UButton icon="i-heroicons-pencil-square" variant="ghost" color="neutral" size="sm" @click.stop="navigateTo(`/projects/${project.id}`)" />
+              <UButton label="View Menu" color="emerald" size="sm" variant="soft" />
             </div>
           </div>
         </div>
@@ -131,41 +110,58 @@ const items = computed(() => {
     </div>
 
     <!-- List Layout -->
-    <div v-else class="space-y-4">
+    <div v-else-if="layout === 'list' && projects?.length" class="space-y-4">
       <UCard
-        v-for="item in items"
-        :key="item.id"
+        v-for="project in projects"
+        :key="project.id"
         class="bg-white/5 border-white/10 hover:border-emerald-500/50 transition-colors cursor-pointer"
         :ui="{ body: { padding: 'p-4' } }"
+        @click="navigateTo(`/projects/${project.id}`)"
       >
         <div class="flex items-center gap-6">
-          <div class="size-24 rounded-lg bg-zinc-900 flex items-center justify-center shrink-0">
-            <UIcon name="i-heroicons-photo" class="size-8 text-gray-700" />
+          <div class="size-24 rounded-lg bg-zinc-900 flex items-center justify-center shrink-0 overflow-hidden border border-white/10">
+            <img v-if="project.logo" :src="project.logo" class="size-full object-cover" />
+            <UIcon v-else name="i-heroicons-photo" class="size-8 text-gray-700" />
           </div>
           
           <div class="flex-1 min-w-0">
             <div class="flex items-start justify-between">
               <div>
-                <UBadge :label="item.category" size="xs" variant="soft" color="emerald" class="mb-1" />
-                <h3 class="font-bold text-lg text-white">{{ item.name }}</h3>
-                <p class="text-sm text-gray-400 truncate">{{ item.description }}</p>
-              </div>
-              <div class="text-right">
-                <div class="text-xl font-bold text-white">${{ item.price }}</div>
-                <div class="flex items-center gap-1 text-yellow-500 text-xs justify-end">
-                  <UIcon name="i-heroicons-star-solid" class="size-3" />
-                  <span>{{ item.rating }}</span>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="font-bold text-lg text-white">{{ project.title }}</h3>
+                  <UBadge :label="project.isPublished ? 'Published' : 'Draft'" size="xs" variant="soft" :color="project.isPublished ? 'success' : 'warning'" />
+                </div>
+                <p class="text-sm text-gray-400 line-clamp-2 italic">{{ project.description }}</p>
+                <div class="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                  <span v-if="project.address" class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-map-pin" class="size-3" />
+                    {{ project.address }}
+                  </span>
+                  <span v-if="project.phone" class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-phone" class="size-3" />
+                    {{ project.phone }}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="flex items-center gap-2 pl-4 border-l border-white/10">
-            <UButton icon="i-heroicons-pencil-square" variant="ghost" color="neutral" />
-            <UButton icon="i-heroicons-trash" variant="ghost" color="error" />
+            <UButton icon="i-heroicons-pencil-square" variant="ghost" color="neutral" @click.stop="navigateTo(`/projects/${project.id}`)" />
+            <UPopconfirm title="Are you sure?" description="This action cannot be undone." @confirm="deleteProject(project.id)">
+              <UButton icon="i-heroicons-trash" variant="ghost" color="error" @click.stop />
+            </UPopconfirm>
           </div>
         </div>
       </UCard>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="status === 'success' || status === 'error'" class="flex flex-col items-center justify-center py-20 bg-white/5 border border-dashed border-white/10 rounded-xl">
+      <UIcon name="i-heroicons-folder-plus" class="size-16 text-gray-600 mb-4" />
+      <h3 class="text-xl font-bold text-white mb-2">No projects found</h3>
+      <p class="text-gray-400 mb-6">Start by creating your first digital menu project.</p>
+      <DashboardProjectsNewProject @success="refresh" />
     </div>
   </div>
 </template>

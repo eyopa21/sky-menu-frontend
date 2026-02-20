@@ -8,6 +8,7 @@ const { uploadFile } = useFileUploader()
 const toast = useToast()
 const loading = ref(false)
 const isOpen = ref(false)
+const emit = defineEmits(['success'])
 
 const state = reactive({
   title: '',
@@ -38,13 +39,14 @@ async function onSubmit(event: { data: TCreateProjectValidationSchema }) {
     const data = await projectRepo.createProject({
       description: event.data.description,
       title: event.data.title,
-      logo: logoUpload.status === 'fulfilled' ? logoUpload.value : '',
-      coverImage: coverImageUpload.status === 'fulfilled' ? coverImageUpload.value : null,
+      logo: logoUpload.status === 'fulfilled' && logoUpload.value ? logoUpload.value.url : '',
+      coverImage: coverImageUpload.status === 'fulfilled' && coverImageUpload.value ? coverImageUpload.value.url : null,
     })
 
     if (data) {
       isOpen.value = false
       toast.add({ title: 'Project created successfully!', color: 'success' })
+      emit('success')
       // Clear state
       state.title = ''
       state.description = ''
@@ -59,7 +61,7 @@ async function onSubmit(event: { data: TCreateProjectValidationSchema }) {
 </script>
 
 <template>
-  <div>
+  <div class="inline-block">
     <UButton label="New Project" icon="i-heroicons-plus" @click="isOpen = true" />
 
     <UModal v-model:open="isOpen" title="New Project" description="Create a new digital menu project.">
@@ -67,7 +69,7 @@ async function onSubmit(event: { data: TCreateProjectValidationSchema }) {
         <UForm
           :schema="CreateProjectValidationSchema"
           :state="state"
-          class="space-y-6"
+          class="space-y-6 p-6"
           @submit="onSubmit"
         >
           <UFormField label="Title" name="title" required>
@@ -88,10 +90,17 @@ async function onSubmit(event: { data: TCreateProjectValidationSchema }) {
             />
           </UFormField>
 
-          <!-- File Uploaders would go here - preserved original comment logic -->
-          <div class="flex justify-end gap-3">
+          <UFormField label="Logo" name="logo" required>
+            <AppFileUploader v-model="state.logo" name="logo" />
+          </UFormField>
+
+          <UFormField label="Cover Image" name="coverImage">
+            <AppFileUploader v-model="state.coverImage" name="coverImage" />
+          </UFormField>
+
+          <div class="flex justify-end gap-3 pt-4">
             <UButton variant="ghost" label="Cancel" @click="isOpen = false" />
-            <UButton type="submit" label="Create Project" :loading="loading" />
+            <UButton type="submit" label="Create Project" :loading="loading" color="success" />
           </div>
         </UForm>
       </template>
