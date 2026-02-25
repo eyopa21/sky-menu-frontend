@@ -1,68 +1,43 @@
 <script setup lang="ts">
+import { useAuthStore } from '~/store/auth'
+
+const authStore = useAuthStore()
+const currentUser = computed(() => authStore.session?.user)
+
 const items = ref([
   {
-    label: 'General',
-    icon: 'i-heroicons-envelope',
-    badge: 5,
+    label: 'Main Dashboard',
+    icon: 'i-heroicons-squares-2x2',
     open: true,
     items: [
       {
-        label: 'Menu Items',
-        icon: 'i-mdi-food',
-        shortcut: '⌘+N',
+        label: 'My Projects',
+        icon: 'i-heroicons-folder-open',
+        to: '/projects',
+        active: true
       },
       {
-        label: 'QR Code',
-        icon: 'i-mdi-qrcode-edit',
-      },
-      {
-        label: 'Feedbacks',
-        icon: 'i-mdi-comment',
-        badge: 5,
+        label: 'QR Generation',
+        icon: 'i-heroicons-qr-code',
       },
       {
         label: 'Analytics',
-        icon: 'i-mdi-chart-bar',
-        shortcut: '⌘+T',
+        icon: 'i-heroicons-chart-bar-square',
       },
     ],
   },
   {
-    label: 'Settings',
-    icon: 'i-heroicons-chart-bar',
-    shortcut: '⌘+R',
+    label: 'Resources',
+    icon: 'i-heroicons-book-open',
     open: false,
     items: [
       {
-        label: 'Menu Details',
-        icon: 'i-mdi-cog-sync',
+        label: 'Feedbacks',
+        icon: 'i-heroicons-chat-bubble-left-right',
       },
       {
-        label: 'Design',
-        icon: 'i-mdi-brush',
-      },
-      {
-        label: 'Users',
-        icon: 'i-mdi-account-group',
-        badge: 8,
-      },
-    ],
-  },
-  {
-    label: 'Help',
-    icon: 'i-heroicons-user',
-    shortcut: '⌘+W',
-    open: false,
-    items: [
-      {
-        label: 'About us',
-        icon: 'i-mdi-account-details',
-        shortcut: '⌘+O',
-      },
-      {
-        label: 'Support',
-        icon: 'i-mdi-chat-question',
-        shortcut: '⌘+P',
+        label: 'Help Center',
+        icon: 'i-heroicons-lifebuoy',
       },
     ],
   },
@@ -71,73 +46,80 @@ const items = ref([
 function toggleSection(index: number) {
   items.value[index].open = !items.value[index].open
 }
+
+const router = useRouter()
+const activePath = computed(() => router.currentRoute.value.path)
+
+function isActive(to?: string) {
+  if (!to) return false
+  return activePath.value.startsWith(to)
+}
 </script>
 
 <template>
-  <div class="fixed h-screen w-80 border-r border-gray-800 bg-[#09090b]">
-    <div class="flex h-full flex-col">
-      <div class="flex shrink-0 items-center justify-between px-6 pt-6">
-        <span class="inline-flex items-center gap-2">
-          <UIcon name="i-heroicons-cloud-arrow-up" class="size-8 text-white" />
-          <span class="text-2xl font-bold text-white">SKy Menu</span>
-        </span>
+  <div class="fixed h-screen w-80 border-r border-white/5 dark:border-white/5 light:border-gray-100 bg-[#09090b]/95 dark:bg-[#09090b]/95 light:bg-[#fcfdfd] backdrop-blur-3xl z-50">
+    <!-- Sidebar Decor -->
+    <div class="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-emerald-500/5 to-transparent pointer-events-none" />
+
+    <div class="flex h-full flex-col relative z-10">
+      <div class="flex shrink-0 items-center gap-3 px-8 pt-10 mb-10">
+        <div class="size-10 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+           <UIcon name="i-heroicons-cloud-arrow-up" class="size-6 text-black" />
+        </div>
+        <span class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tighter">SKy <span class="text-emerald-500">Menu</span></span>
       </div>
       
-      <div class="px-4 py-4">
-        <USeparator class="opacity-20" />
-      </div>
-
-      <div class="flex-1 overflow-y-auto px-4">
-        <div v-for="(section, index) in items" :key="index" class="mb-2">
+      <div class="flex-1 overflow-y-auto px-4 custom-scrollbar">
+        <div v-for="(section, index) in items" :key="index" class="mb-4">
           <button
-            class="flex w-full cursor-pointer items-center justify-between rounded-lg p-3 text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+            class="flex w-full cursor-pointer items-center justify-between rounded-2xl p-4 text-[11px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-500 light:text-gray-400 hover:bg-white/5 hover:text-white dark:hover:text-white light:hover:text-emerald-900 transition-all group"
             @click="toggleSection(index)"
           >
             <div class="flex items-center gap-3">
-              <UIcon :name="section.icon" class="size-5" />
+              <UIcon :name="section.icon" class="size-4 opacity-50 group-hover:opacity-100 transition-opacity" />
               <span>{{ section.label }}</span>
             </div>
             <UIcon 
-              name="i-heroicons-chevron-down" 
-              class="size-4 transform transition-transform"
-              :class="{ 'rotate-180': section.open }"
+              name="i-heroicons-chevron-right" 
+              class="size-3 transform transition-transform duration-300"
+              :class="{ 'rotate-90': section.open }"
             />
           </button>
           
-          <div v-show="section.open" class="mt-1 space-y-1 pl-4">
+          <div v-show="section.open" class="mt-1 space-y-1">
             <NuxtLink
               v-for="(subItem, subKey) in section.items"
               :key="subKey"
-              class="flex cursor-pointer items-center rounded-lg p-3 text-sm font-medium text-gray-500 hover:bg-white/5 hover:text-white transition-colors"
+              :to="subItem.to"
+              class="flex cursor-pointer items-center rounded-2xl p-4 text-sm font-bold transition-all border border-transparent"
+              :class="isActive(subItem.to)
+                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-sm'
+                : 'text-gray-500 dark:text-gray-500 light:text-gray-600 hover:bg-white/[0.04] dark:hover:bg-white/[0.04] light:hover:bg-gray-100 hover:text-white dark:hover:text-white light:hover:text-emerald-900'"
             >
-              <UIcon v-if="subItem.icon" :name="subItem.icon" class="mr-3 size-5" />
+              <UIcon v-if="subItem.icon" :name="subItem.icon" class="mr-4 size-5" />
               <span>{{ subItem.label }}</span>
-              <UBadge
-                v-if="subItem.badge"
-                :label="subItem.badge.toString()"
-                size="sm"
-                variant="soft"
-                class="ml-auto"
-              />
             </NuxtLink>
           </div>
         </div>
       </div>
 
-      <div class="mt-auto p-4">
-        <USeparator class="mb-4 opacity-20" />
+      <!-- User Profile at Bottom -->
+      <div class="mt-auto p-6 bg-gradient-to-t from-white/[0.02] to-transparent dark:from-white/[0.02] light:from-gray-50 border-t border-white/5 dark:border-white/5 light:border-gray-100">
         <NuxtLink 
           to="/account/settings"
-          class="flex items-center gap-3 rounded-lg p-3 text-white hover:bg-white/5 cursor-pointer transition-colors"
+          class="flex items-center gap-4 rounded-2xl p-3 text-white dark:text-white light:text-gray-900 hover:bg-white/[0.05] dark:hover:bg-white/[0.05] light:hover:bg-white cursor-pointer transition-all border border-transparent hover:border-white/5 dark:hover:border-white/5 light:hover:border-gray-200"
         >
-          <UAvatar
-            :src="currentUser?.avatar || 'https://fqjltiegiezfetthbags.supabase.co/storage/v1/object/public/block.images/blocks/avatars/amyelsner.png'"
-            :alt="currentUser?.full_name || 'User'"
-            size="md"
-          />
+          <div class="relative">
+             <div class="absolute -inset-1 bg-emerald-500 rounded-full blur-md opacity-0 hover:opacity-20 transition-opacity" />
+             <UAvatar
+              :src="currentUser?.avatar_url || 'https://fqjltiegiezfetthbags.supabase.co/storage/v1/object/public/block.images/blocks/avatars/amyelsner.png'"
+              size="md"
+              class="relative ring-2 ring-white/10 dark:ring-white/10 light:ring-gray-200"
+            />
+          </div>
           <div class="flex flex-col min-w-0">
-            <span class="text-sm font-bold truncate">{{ currentUser?.full_name || 'User' }}</span>
-            <span class="text-xs text-gray-500 truncate">{{ currentUser?.email || 'No email' }}</span>
+            <span class="text-sm font-black truncate tracking-tight">{{ currentUser?.full_name || 'Architect' }}</span>
+            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider truncate">{{ currentUser?.email || 'Admin Panel' }}</span>
           </div>
         </NuxtLink>
       </div>

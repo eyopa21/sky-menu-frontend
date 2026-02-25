@@ -1,5 +1,6 @@
 import type { Menu } from '~/repositories/menus/response/menus'
 import type { Category } from '~/repositories/categories/response/categories'
+import type { MenuItem } from '~/repositories/menu-items/response/menu-items'
 
 export type Project = {
   id: number
@@ -19,6 +20,6 @@ export type Project = {
   createdAt: string
   updatedAt: string
   deletedAt: string | null
-  menu?: Menu & { menuItems?: any[] }
+  menu?: Menu & { menuItems?: MenuItem[] }
   categories?: Category[]
 }

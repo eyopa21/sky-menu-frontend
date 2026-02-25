@@ -24,6 +24,12 @@ const state = reactive({
   imageUrl: props.category?.imageUrl || '',
 })
 
+watch(() => props.category, (newVal) => {
+  state.name = newVal?.name || ''
+  state.description = newVal?.description || ''
+  state.imageUrl = newVal?.imageUrl || ''
+}, { immediate: true })
+
 const imageFile = ref<File | undefined>(undefined)
 
 async function onSubmit(event: { data: TCategoryValidationSchema }) {
@@ -64,12 +70,25 @@ async function onSubmit(event: { data: TCategoryValidationSchema }) {
 </script>
 
 <template>
-  <UModal v-model:open="isOpen" :title="category ? 'Edit Category' : 'Add New Category'">
-    <template #content>
+  <USlideover v-model:open="isOpen">
+    <template #header>
+      <div class="flex items-center justify-between w-full h-full">
+        <h3 class="text-xl font-bold text-white">{{ category ? 'Edit Category' : 'Add New Category' }}</h3>
+        <UButton
+          color="neutral"
+          variant="ghost"
+          icon="i-heroicons-x-mark"
+          @click="isOpen = false"
+        />
+      </div>
+    </template>
+
+    <template #body>
       <UForm
+        :id="'category-form-' + (category?.id || 'new')"
         :schema="CategoryValidationSchema"
         :state="state"
-        class="space-y-6 p-6"
+        class="space-y-6"
         @submit="onSubmit"
       >
         <UFormField label="Name" name="name" required>
@@ -81,15 +100,39 @@ async function onSubmit(event: { data: TCategoryValidationSchema }) {
         </UFormField>
 
         <UFormField label="Category Image" name="imageUrl">
+          <div v-if="state.imageUrl && !imageFile" class="relative group aspect-video rounded-xl overflow-hidden border border-white/10 mb-4 bg-zinc-900 shadow-inner">
+            <img :src="state.imageUrl" class="size-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <UButton
+                color="error"
+                variant="soft"
+                icon="i-heroicons-trash"
+                size="sm"
+                @click="state.imageUrl = ''"
+              >
+                Remove
+              </UButton>
+            </div>
+            <div class="absolute bottom-2 left-2 px-2 py-1 bg-black/60 backdrop-blur-md rounded text-xs text-white border border-white/10">
+              Current Cover
+            </div>
+          </div>
           <AppFileUploader v-model="imageFile" name="category-image" />
-          <p v-if="state.imageUrl && !imageFile" class="text-xs text-gray-400 mt-2">Current image: {{ state.imageUrl }}</p>
         </UFormField>
-
-        <div class="flex justify-end gap-3 pt-6 border-t border-white/10">
-          <UButton variant="ghost" label="Cancel" @click="isOpen = false" />
-          <UButton type="submit" :label="category ? 'Save Changes' : 'Create Category'" :loading="loading" color="success" />
-        </div>
       </UForm>
     </template>
-  </UModal>
+
+    <template #footer>
+      <div class="flex justify-end gap-3 w-full">
+        <UButton variant="ghost" label="Cancel" @click="isOpen = false" />
+        <UButton
+          type="submit"
+          :form="'category-form-' + (category?.id || 'new')"
+          :label="category ? 'Save Changes' : 'Create Category'"
+          :loading="loading"
+          color="success"
+        />
+      </div>
+    </template>
+  </USlideover>
 </template>

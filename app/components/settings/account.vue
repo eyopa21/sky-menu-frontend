@@ -45,8 +45,6 @@ async function onSubmit(event: { data: TUpdateAccountValidationSchema }) {
   if (currentUser.value?.id) {
     try {
       loading.value = true
-      // ensure date_of_birth is a Date object for the repository if expected, 
-      // but the backend might handle string too. UpdateAccountValidationSchema uses z.date()
       const data = await userRepo.updateMyAccount(currentUser.value.id, event.data)
       if (data) {
         authStore.updateSession({
@@ -68,87 +66,112 @@ async function onSubmit(event: { data: TUpdateAccountValidationSchema }) {
 </script>
 
 <template>
-  <UCard
-    class="bg-white/5 border-white/10 backdrop-blur-xl"
-    :ui="{ body: { padding: 'p-6 md:p-12' } }"
-  >
-    <UForm
-      :schema="UpdateAccountValidationSchema"
-      :state="state"
-      class="space-y-10"
-      @submit="onSubmit"
-    >
-      <div class="border-b border-white/10 pb-10">
-        <h2 class="text-xl font-bold text-white">Your Account</h2>
-        <p class="text-sm text-gray-400">Update your personal information.</p>
-      </div>
+  <div class="relative group">
+    <!-- Glow behind card -->
+    <div class="absolute -inset-2 bg-emerald-500/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-      <div class="space-y-8">
-        <UFormField label="Full Name" name="full_name" class="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-          <UInput
-            v-model="state.full_name"
-            icon="i-heroicons-user"
-            placeholder="John Doe"
-            class="w-full"
-            size="lg"
-            :ui="{ base: 'bg-white/5 border-white/10 focus:ring-emerald-500/50' }"
-          />
-        </UFormField>
+    <div class="p-[1px] rounded-[32px] bg-gradient-to-br from-white/10 to-transparent dark:from-white/10 light:from-gray-200 transition-all duration-500 shadow-sm">
+      <UCard
+        class="bg-[#0d0d0f]/80 dark:bg-[#0d0d0f]/80 light:bg-white border-none rounded-[31px] backdrop-blur-2xl"
+        :ui="{ body: { padding: 'p-8 md:p-12' } }"
+      >
+        <UForm
+          :schema="UpdateAccountValidationSchema"
+          :state="state"
+          class="space-y-12"
+          @submit="onSubmit"
+        >
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/5 dark:border-white/5 light:border-gray-100 pb-10">
+            <div>
+              <h2 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Public Profile</h2>
+              <p class="text-gray-500 dark:text-gray-500 light:text-gray-600 font-medium max-w-sm">Manage how your restaurant brand is represented.</p>
+            </div>
+            <UButton
+              type="submit"
+              label="Save Profile"
+              icon="i-heroicons-check-circle"
+              :loading="loading"
+              class="rounded-xl font-black px-8 py-3 bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 active:scale-95 transition-all w-full md:w-auto"
+            />
+          </div>
 
-        <UFormField label="Phone Number" name="phone_number" class="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-          <UInput
-            v-model="state.phone_number"
-            icon="i-heroicons-phone"
-            placeholder="0911..."
-            class="w-full"
-            size="lg"
-            :ui="{ base: 'bg-white/5 border-white/10 focus:ring-emerald-500/50' }"
-          />
-        </UFormField>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+            <!-- Full Name -->
+            <UFormField label="Full Name" name="full_name">
+              <UInput
+                v-model="state.full_name"
+                icon="i-heroicons-user"
+                placeholder="The name as it will appear"
+                size="xl"
+                class="w-full"
+                :ui="{ 
+                  base: 'rounded-2xl border-white/10 dark:border-white/10 light:border-gray-200 bg-white/5 dark:bg-white/5 light:bg-gray-50 focus:ring-emerald-500',
+                  icon: { leading: { wrapper: 'text-emerald-500/50' } }
+                }"
+              />
+            </UFormField>
 
-        <UFormField label="Date of Birth" name="date_of_birth" class="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-          <UInput
-            v-model="state.date_of_birth"
-            type="date"
-            icon="i-heroicons-calendar"
-            class="w-full"
-            size="lg"
-            :ui="{ base: 'bg-white/5 border-white/10 focus:ring-emerald-500/50' }"
-          />
-        </UFormField>
+            <!-- Phone -->
+            <UFormField label="Contact Number" name="phone_number">
+              <UInput
+                v-model="state.phone_number"
+                icon="i-heroicons-phone"
+                placeholder="Phone number for orders"
+                size="xl"
+                class="w-full"
+                :ui="{ 
+                  base: 'rounded-2xl border-white/10 dark:border-white/10 light:border-gray-200 bg-white/5 dark:bg-white/5 light:bg-gray-50 focus:ring-emerald-500',
+                  icon: { leading: { wrapper: 'text-emerald-500/50' } }
+                }"
+              />
+            </UFormField>
 
-        <UFormField label="Gender" name="sex" class="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-          <USelect
-            v-model="state.sex"
-            :options="[{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }]"
-            class="w-full"
-            size="lg"
-            :ui="{ base: 'bg-white/5 border-white/10' }"
-          />
-        </UFormField>
+            <!-- DOB -->
+            <UFormField label="Anniversary / Founded" name="date_of_birth">
+              <UInput
+                v-model="state.date_of_birth"
+                type="date"
+                icon="i-heroicons-calendar"
+                size="xl"
+                class="w-full"
+                :ui="{ 
+                  base: 'rounded-2xl border-white/10 dark:border-white/10 light:border-gray-200 bg-white/5 dark:bg-white/5 light:bg-gray-50 focus:ring-emerald-500',
+                  icon: { leading: { wrapper: 'text-emerald-500/50' } }
+                }"
+              />
+            </UFormField>
 
-        <UFormField label="Email (Permanent)" class="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-            <UInput
+            <!-- Gender -->
+            <UFormField label="Brand Segment" name="sex">
+              <USelect
+                v-model="state.sex"
+                :options="[{ label: 'Male Segment', value: 'male' }, { label: 'Female Segment', value: 'female' }]"
+                size="xl"
+                class="w-full"
+                :ui="{ 
+                  base: 'rounded-2xl border-white/10 dark:border-white/10 light:border-gray-200 bg-white/5 dark:bg-white/5 light:bg-gray-50 focus:ring-emerald-500'
+                }"
+              />
+            </UFormField>
+
+            <!-- Email -->
+            <UFormField label="Administrative Email" class="md:col-span-2">
+              <UInput
                 :model-value="currentUser?.email"
                 icon="i-heroicons-envelope"
                 disabled
-                class="w-full opacity-60 cursor-not-allowed"
-                size="lg"
-                :ui="{ base: 'bg-white/5 border-white/10' }"
-            />
-        </UFormField>
-      </div>
-
-      <div class="flex justify-end pt-10 border-t border-white/10">
-        <UButton
-          type="submit"
-          label="Save Changes"
-          icon="i-heroicons-check"
-          :loading="loading"
-          size="xl"
-          class="bg-emerald-500 text-black hover:bg-emerald-400 font-bold px-8 shadow-lg shadow-emerald-500/10"
-        />
-      </div>
-    </UForm>
-  </UCard>
+                size="xl"
+                class="w-full opacity-60 pointer-events-none"
+                :ui="{ 
+                  base: 'rounded-2xl border-white/5 dark:border-white/5 light:border-gray-100 bg-white/[0.02] dark:bg-white/[0.02] light:bg-gray-100/50 cursor-not-allowed',
+                  icon: { leading: { wrapper: 'text-gray-500' } }
+                }"
+              />
+              <p class="text-[10px] text-gray-500 mt-2 font-bold uppercase tracking-widest pl-2">Email is fixed to your identity</p>
+            </UFormField>
+          </div>
+        </UForm>
+      </UCard>
+    </div>
+  </div>
 </template>

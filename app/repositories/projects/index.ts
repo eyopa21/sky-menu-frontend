@@ -36,5 +36,11 @@ export function projectsRepository<T>(fetch: $Fetch<T, NitroFetchRequest>) {
         method: 'DELETE',
       })
     },
+    
+    async getProjectBySlug(slug: string): Promise<Project> {
+      return fetch<Project>(`/projects/slug/${slug}`, {
+        method: 'GET',
+      })
+    },
   }
 }

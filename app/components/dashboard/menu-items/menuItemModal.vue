@@ -34,6 +34,20 @@ const state = reactive({
 const imageFiles = ref<File[]>([])
 const currentImages = ref<string[]>(props.item?.images || [])
 
+watch(() => props.item, (newVal) => {
+  state.name = newVal?.name || ''
+  state.description = newVal?.description || ''
+  state.price = newVal?.price || 0
+  state.vatIncluded = newVal?.vatIncluded ?? true
+  state.isAvailable = newVal?.isAvailable ?? true
+  state.calories = newVal?.calories || undefined
+  state.preparationTime = newVal?.preparationTime || undefined
+  state.categoryId = newVal?.categoryId || (props.categories.length > 0 ? props.categories[0].id : undefined)
+  
+  currentImages.value = newVal?.images || []
+  imageFiles.value = [] // Reset staged uploads when item changes
+}, { immediate: true })
+
 async function onSubmit(event: { data: TMenuItemValidationSchema }) {
   try {
     loading.value = true
@@ -82,51 +96,64 @@ const removeImage = (index: number) => {
 </script>
 
 <template>
-  <UModal v-model:open="isOpen" :title="item ? 'Edit Menu Item' : 'Add Menu Item'">
-    <template #content>
+  <USlideover v-model:open="isOpen">
+    <template #header>
+      <div class="flex items-center justify-between w-full h-full">
+        <h3 class="text-xl font-bold text-white">{{ item ? 'Edit Menu Item' : 'Add Menu Item' }}</h3>
+        <UButton
+          color="neutral"
+          variant="ghost"
+          icon="i-heroicons-x-mark"
+          @click="isOpen = false"
+        />
+      </div>
+    </template>
+
+    <template #body>
       <UForm
+        :id="'menu-item-form-' + (item?.id || 'new')"
         :schema="MenuItemValidationSchema"
         :state="state"
-        class="space-y-6 p-6"
+        class="space-y-6"
         @submit="onSubmit"
       >
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <UFormField label="Name" name="name" required class="md:col-span-2">
+        <div class="space-y-6">
+          <UFormField label="Name" name="name" required>
             <UInput v-model="state.name" placeholder="Item name" class="w-full" />
           </UFormField>
 
-          <UFormField label="Category" name="categoryId" required>
-            <USelect v-model="state.categoryId" :items="categories.map(c => ({ label: c.name, value: c.id }))" />
-          </UFormField>
+          <div class="grid grid-cols-2 gap-4">
+            <UFormField label="Category" name="categoryId" required>
+              <USelect v-model="state.categoryId" :items="categories.map(c => ({ label: c.name, value: c.id }))" class="w-full" />
+            </UFormField>
 
-          <UFormField label="Price" name="price" required>
-            <UInput v-model="state.price" type="number" step="0.01" />
-          </UFormField>
+            <UFormField label="Price" name="price" required>
+              <UInput v-model="state.price" type="number" step="0.01" class="w-full" />
+            </UFormField>
+          </div>
 
-          <UFormField label="Description" name="description" class="md:col-span-2">
+          <UFormField label="Description" name="description">
             <UTextarea v-model="state.description" :rows="3" />
           </UFormField>
 
-          <div class="md:col-span-2 flex flex-wrap gap-6 items-center bg-white/5 p-4 rounded-xl border border-white/10">
+          <div class="flex flex-col gap-3 bg-zinc-900/50 p-4 rounded-xl border border-white/10">
             <UCheckbox v-model="state.vatIncluded" label="Price includes VAT" />
             <UCheckbox v-model="state.isAvailable" label="Item is Available" />
           </div>
 
-          <div class="md:col-span-1">
+          <div class="grid grid-cols-2 gap-4">
             <UFormField label="Calories (kcal)" name="calories">
-              <UInput v-model="state.calories" type="number" placeholder="Optional" />
+              <UInput v-model="state.calories" type="number" placeholder="Optional" class="w-full" />
             </UFormField>
-          </div>
 
-          <div class="md:col-span-1">
             <UFormField label="Prep. Time (min)" name="preparationTime">
-              <UInput v-model="state.preparationTime" type="number" placeholder="Optional" />
+              <UInput v-model="state.preparationTime" type="number" placeholder="Optional" class="w-full" />
             </UFormField>
           </div>
 
-          <div class="md:col-span-2 space-y-4">
+          <div class="space-y-4">
             <label class="text-sm font-medium text-white">Images</label>
-            <div class="grid grid-cols-4 gap-2 mb-2">
+            <div class="grid grid-cols-3 gap-2 mb-2">
               <div v-for="(img, index) in currentImages" :key="index" class="relative aspect-square rounded-lg overflow-hidden border border-white/10">
                 <img :src="img" class="size-full object-cover" />
                 <button @click.prevent="removeImage(index)" class="absolute top-1 right-1 bg-black/50 rounded-full p-0.5 hover:bg-black/80 transition-colors">
@@ -138,12 +165,20 @@ const removeImage = (index: number) => {
             <p class="text-xs text-gray-400">At least one image is required to publish this item.</p>
           </div>
         </div>
-
-        <div class="flex justify-end gap-3 pt-6 border-t border-white/10">
-          <UButton variant="ghost" label="Cancel" @click="isOpen = false" />
-          <UButton type="submit" :label="item ? 'Save Changes' : 'Add Item'" :loading="loading" color="success" />
-        </div>
       </UForm>
     </template>
-  </UModal>
+
+    <template #footer>
+      <div class="flex justify-end gap-3 w-full">
+        <UButton variant="ghost" label="Cancel" @click="isOpen = false" />
+        <UButton
+          type="submit"
+          :form="'menu-item-form-' + (item?.id || 'new')"
+          :label="item ? 'Save Changes' : 'Add Item'"
+          :loading="loading"
+          color="success"
+        />
+      </div>
+    </template>
+  </USlideover>
 </template>

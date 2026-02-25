@@ -16,11 +16,11 @@ const items = [
     slot: 'header'
   }],
   [{
-    label: 'New',
-    icon: 'i-heroicons-plus',
-    kbds: ['meta', 'n']
+    label: 'Projects',
+    icon: 'i-heroicons-folder-open',
+    to: '/projects'
   }, {
-    label: 'Settings',
+    label: 'Account Settings',
     icon: 'i-heroicons-cog-8-tooth',
     to: '/account/settings'
   }],
@@ -55,12 +55,16 @@ async function logout() {
 
 <template>
   <UDropdown :items="items" :ui="{ width: 'w-64' }">
+    <div class="relative group cursor-pointer">
+      <!-- Glow ring animation -->
+      <div class="absolute -inset-0.5 rounded-full bg-emerald-500/30 opacity-0 group-hover:opacity-100 blur transition-opacity duration-300" />
       <UAvatar
         src="https://fqjltiegiezfetthbags.supabase.co/storage/v1/object/public/block.images/blocks/avatars/amyelsner.png"
         alt="User Avatar"
         size="md"
-        class="cursor-pointer ring-2 ring-emerald-500/20 hover:ring-emerald-500/50 transition-all"
+        class="relative ring-2 ring-emerald-500/30 group-hover:ring-emerald-500/60 transition-all duration-300"
       />
+    </div>
 
     <template #header="{ item }">
       <div class="flex flex-col gap-1 p-2">
@@ -69,6 +73,9 @@ async function logout() {
         </p>
         <p class="text-sm font-medium text-white truncate">
           {{ session?.user.full_name }}
+        </p>
+        <p class="text-xs text-gray-500 truncate">
+          {{ session?.user.email }}
         </p>
       </div>
     </template>
