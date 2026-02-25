@@ -9,5 +9,12 @@ export function commonRepository<T>(fetch: $Fetch<T, NitroFetchRequest>) {
         body: uploadFileDto,
       })
     },
+
+    async uploadMultipleFiles(body: FormData): Promise<FileUploadResponse[]> {
+      return fetch<FileUploadResponse[]>('cloudinary/uploads', {
+        method: 'POST',
+        body,
+      })
+    },
   }
 }
