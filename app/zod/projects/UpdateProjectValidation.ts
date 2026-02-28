@@ -14,6 +14,7 @@ export const UpdateProjectValidationSchema = z.object({
   isPublished: z.boolean().optional(),
   primaryColor: z.string().nullable().optional(),
   accentColor: z.string().nullable().optional(),
+  menuUIType: z.enum(['one', 'two', 'three']).optional(),
 })
 
 export type TUpdateProjectValidationSchema = z.output<typeof UpdateProjectValidationSchema>

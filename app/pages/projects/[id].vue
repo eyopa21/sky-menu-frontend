@@ -52,6 +52,7 @@ const state = reactive({
   isPublished: project.value?.isPublished || false,
   primaryColor: project.value?.primaryColor || '#10b981',
   accentColor: project.value?.accentColor || '#3b82f6',
+  menuUIType: project.value?.menuUIType || 'one',
 })
 
 watch(project, (newVal) => {
@@ -65,6 +66,7 @@ watch(project, (newVal) => {
     state.isPublished = newVal.isPublished
     state.primaryColor = newVal.primaryColor || '#10b981'
     state.accentColor = newVal.accentColor || '#3b82f6'
+    state.menuUIType = newVal.menuUIType || 'one'
   }
 }, { immediate: true })
 
@@ -566,6 +568,35 @@ const goToCategories = () => {
                         </div>
                     </UFormField>
                 </div>
+            </div>
+
+            <!-- Menu UI Type -->
+            <div class="space-y-4">
+              <div class="flex items-center gap-2 px-1">
+                <UIcon name="i-heroicons-computer-desktop" class="size-4 text-emerald-500" />
+                <h4 class="text-xs font-black uppercase tracking-widest text-white dark:text-white light:text-gray-900">Menu UI Style</h4>
+              </div>
+              <div class="grid grid-cols-3 gap-3">
+                <div 
+                  v-for="type in ['one', 'two', 'three']" 
+                  :key="type"
+                  class="relative cursor-pointer transition-all active:scale-95"
+                  @click="state.menuUIType = type"
+                >
+                  <div 
+                    class="p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-3 bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-50"
+                    :class="state.menuUIType === type ? 'border-emerald-500 shadow-lg shadow-emerald-500/10' : 'border-white/5 dark:border-white/5 light:border-gray-200'"
+                  >
+                    <div class="size-10 rounded-xl flex items-center justify-center bg-white/[0.05]" :class="state.menuUIType === type ? 'text-emerald-500' : 'text-gray-500'">
+                       <span class="text-lg font-black uppercase">{{ type }}</span>
+                    </div>
+                    <p class="text-[10px] font-black uppercase tracking-widest" :class="state.menuUIType === type ? 'text-emerald-400' : 'text-gray-500'">Style {{ type }}</p>
+                  </div>
+                  <div v-if="state.menuUIType === type" class="absolute -top-1 -right-1 size-5 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-[#0d0d0f]">
+                    <UIcon name="i-heroicons-check" class="size-3 text-black font-black" />
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Public switch -->

@@ -13,6 +13,7 @@ export type Project = {
   currency: string
   primaryColor: string | null
   accentColor: string | null
+  menuUIType: 'one' | 'two' | 'three'
   isPublished: boolean
   address: string | null
   phone: string | null
