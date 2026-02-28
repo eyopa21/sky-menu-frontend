@@ -16,14 +16,14 @@ const emit = defineEmits<{
 const activeCategory = ref<number | null>(null)
 
 const categoriesWithItems = computed(() => {
-  return props.categories.filter(cat => 
-    props.menuItemsByCategory[cat.id]?.length > 0
+  return props.categories?.filter(cat => 
+    props.menuItemsByCategory && props.menuItemsByCategory[cat.id]?.length > 0
   ) || []
 })
 
 onMounted(() => {
-  if (categoriesWithItems.value.length > 0) {
-    activeCategory.value = categoriesWithItems.value[0].id
+  if (categoriesWithItems.value?.length > 0) {
+    activeCategory.value = categoriesWithItems.value[0]?.id
   }
 })
 
@@ -52,7 +52,7 @@ const scrollToCategory = (categoryId: number) => {
       <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
       
       <div class="absolute inset-0 flex flex-col items-center justify-end pb-12 px-4 text-center">
-        <div class="size-24 md:size-32 rounded-3xl bg-zinc-900 border-4 border-zinc-950 overflow-hidden shadow-2xl mb-6 group transition-transform hover:scale-105 duration-500">
+        <div class="size-24 md:size-32 rounded-2xl bg-zinc-900 border-4 border-zinc-950 overflow-hidden shadow-2xl mb-6 group transition-transform hover:scale-105 duration-500">
           <img v-if="project.logo" :src="project.logo" class="size-full object-cover" />
           <div v-else class="size-full flex items-center justify-center bg-zinc-800">
             <h1 class="text-4xl font-bold text-white/20">{{ project.title.charAt(0) }}</h1>
@@ -67,15 +67,15 @@ const scrollToCategory = (categoryId: number) => {
 
         <!-- Quick Contacts in Header -->
         <div class="flex flex-wrap justify-center gap-4 text-sm font-bold uppercase tracking-widest text-white/60">
-          <a v-if="project.phone" :href="`tel:${project.phone}`" class="flex items-center gap-2 hover:text-white transition-colors bg-white/5 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+          <a v-if="project.phone" :href="`tel:${project.phone}`" class="flex items-center gap-2 hover:text-white transition-colors bg-white/5 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/10">
             <UIcon name="i-heroicons-phone" class="size-4" />
             <span>Call</span>
           </a>
-          <a v-if="project.address" :href="`https://maps.google.com/?q=${project.address}`" target="_blank" class="flex items-center gap-2 hover:text-white transition-colors bg-white/5 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+          <a v-if="project.address" :href="`https://maps.google.com/?q=${project.address}`" target="_blank" class="flex items-center gap-2 hover:text-white transition-colors bg-white/5 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/10">
             <UIcon name="i-heroicons-map-pin" class="size-4" />
             <span>Map</span>
           </a>
-          <a v-if="project.website" :href="project.website" target="_blank" class="flex items-center gap-2 hover:text-white transition-colors bg-white/5 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+          <a v-if="project.website" :href="project.website" target="_blank" class="flex items-center gap-2 hover:text-white transition-colors bg-white/5 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/10">
             <UIcon name="i-heroicons-globe-alt" class="size-4" />
             <span>Web</span>
           </a>
@@ -84,12 +84,12 @@ const scrollToCategory = (categoryId: number) => {
     </header>
 
     <!-- Sticky Navigation -->
-    <nav class="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 py-3 overflow-x-auto no-scrollbar scroll-smooth shadow-2xl shadow-black/40">
+    <nav class="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 py-4 overflow-x-auto no-scrollbar scroll-smooth shadow-2xl shadow-black/40">
       <div class="flex items-center gap-3 px-4 max-w-5xl mx-auto min-w-max">
         <button
           v-for="cat in categoriesWithItems"
           :key="cat.id"
-          class="px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wider transition-all duration-300 border"
+          class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 border"
           :class="activeCategory === cat.id 
             ? 'shadow-lg shadow-emerald-500/20 scale-105' 
             : 'bg-white/5 text-gray-400 border-transparent hover:bg-white/10 hover:text-white'"
@@ -106,34 +106,34 @@ const scrollToCategory = (categoryId: number) => {
     </nav>
 
     <!-- Menu Content -->
-    <main class="max-w-5xl mx-auto px-4 py-12 space-y-16">
+    <main class="max-w-5xl mx-auto px-6 py-16 space-y-20">
       <section 
         v-for="cat in categoriesWithItems" 
         :id="`category-${cat.id}`" 
         :key="cat.id"
-        class="space-y-8 scroll-mt-24"
+        class="space-y-10 scroll-mt-24"
       >
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-5">
           <div 
-            class="h-10 w-1.5 rounded-full" 
+            class="h-12 w-1.5 rounded-full" 
             :style="{ backgroundColor: project.primaryColor || '#10b981' }"
           />
           <div>
-            <h2 class="text-3xl font-black text-white uppercase tracking-tighter italic">
+            <h2 class="text-4xl font-black text-white uppercase tracking-tighter italic">
               {{ cat.name }}
             </h2>
-            <p v-if="cat.description" class="text-gray-400 text-sm mt-1 uppercase tracking-widest font-semibold opacity-60">
+            <p v-if="cat.description" class="text-gray-500 text-[10px] mt-1.5 uppercase tracking-widest font-black opacity-60">
               {{ cat.description }}
             </p>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div 
             v-for="item in menuItemsByCategory[cat.id]" 
             :key="item.id"
             @click="emit('openItemDetail', item)"
-            class="group bg-zinc-900/40 border border-white/5 rounded-3xl overflow-hidden hover:bg-zinc-900/60 hover:border-white/10 transition-all duration-500 hover:-translate-y-1 shadow-xl hover:shadow-2xl hover:shadow-black/50 cursor-pointer"
+            class="group bg-zinc-900/40 border border-white/5 rounded-2xl overflow-hidden hover:bg-zinc-900/60 hover:border-white/10 transition-all duration-500 hover:-translate-y-1 shadow-2xl hover:shadow-black/60 cursor-pointer"
           >
             <div class="relative aspect-[4/3] overflow-hidden bg-zinc-800">
               <img 
@@ -142,29 +142,32 @@ const scrollToCategory = (categoryId: number) => {
                 class="size-full object-cover group-hover:scale-110 transition-transform duration-700"
               />
               <div v-else class="size-full flex items-center justify-center">
-                <UIcon name="i-heroicons-photo" class="size-12 text-zinc-700" />
+                <UIcon name="i-heroicons-photo" class="size-16 text-zinc-700" />
               </div>
               
-              <div class="absolute top-4 right-4 bg-zinc-950/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-xl">
+              <div class="absolute top-5 right-5 bg-zinc-950/90 backdrop-blur-xl px-4 py-2 rounded-xl border border-white/10 shadow-2xl">
                 <span class="text-lg font-black font-mono tracking-tighter" :style="{ color: project.accentColor || '#3b82f6' }">
                   {{ project.currency }} {{ item.price }}
                 </span>
               </div>
 
               <div v-if="!item.isAvailable" class="absolute inset-0 bg-zinc-950/60 backdrop-blur-[2px] flex items-center justify-center">
-                <span class="px-6 py-2 bg-red-500/90 text-white text-sm font-black uppercase tracking-widest rounded-full shadow-2xl scale-110">
+                <span class="px-6 py-2 bg-red-500/90 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-lg shadow-2xl scale-110">
                   Sold Out
                 </span>
               </div>
             </div>
 
-            <div class="p-6 space-y-3">
+            <div class="p-8 space-y-4">
               <div class="flex items-start justify-between gap-2">
-                <h3 class="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors duration-300 leading-tight">
+                <h3 
+                  class="text-xl font-black text-white transition-colors duration-300 leading-tight group-hover:text-[var(--hover-color)]"
+                  :style="{ '--hover-color': project.primaryColor || '#10b981' }"
+                >
                   {{ item.name }}
                 </h3>
               </div>
-              <p class="text-gray-400 text-sm line-clamp-2 leading-relaxed font-medium">
+              <p class="text-gray-400 text-sm line-clamp-2 leading-relaxed font-medium opacity-80">
                 {{ item.description }}
               </p>
               
@@ -173,19 +176,18 @@ const scrollToCategory = (categoryId: number) => {
                 <span 
                   v-for="tag in item.tags.slice(0, 2)" 
                   :key="tag"
-                  class="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/5 text-white/40 border border-white/5"
+                  class="text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg bg-white/5 text-white/40 border border-white/5"
                 >
                   {{ tag }}
                 </span>
-                <span v-if="item.tags.length > 2" class="text-[10px] font-black text-white/20">+{{ item.tags.length - 2 }}</span>
               </div>
 
-              <div class="pt-4 flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-500 border-t border-white/5">
-                <div v-if="item.calories" class="flex items-center gap-1.5 hover:text-orange-400 transition-colors">
+              <div class="pt-6 flex items-center gap-5 text-[10px] font-black uppercase tracking-widest border-t border-white/5" :style="{ color: project.accentColor || '#6b7280' }">
+                <div v-if="item.calories" class="flex items-center gap-2 transition-colors hover:text-[var(--hover-accent)]" :style="{ '--hover-accent': project.accentColor || '#10b981' }">
                   <UIcon name="i-heroicons-fire" class="size-4" />
                   <span>{{ item.calories }} kcal</span>
                 </div>
-                <div v-if="item.preparationTime" class="flex items-center gap-1.5 hover:text-blue-400 transition-colors">
+                <div v-if="item.preparationTime" class="flex items-center gap-2 transition-colors hover:text-[var(--hover-accent)]" :style="{ '--hover-accent': project.accentColor || '#10b981' }">
                   <UIcon name="i-heroicons-clock" class="size-4" />
                   <span>{{ item.preparationTime }} min</span>
                 </div>
@@ -197,44 +199,44 @@ const scrollToCategory = (categoryId: number) => {
     </main>
 
     <!-- Footer / Contact -->
-    <footer class="bg-zinc-900/50 border-t border-white/5 py-20 mt-20">
-      <div class="max-w-5xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-12 text-center md:text-left">
-        <div class="space-y-6 max-w-md">
-          <div class="flex flex-col md:flex-row items-center gap-6">
-            <div class="size-20 rounded-2xl bg-zinc-800 border-2 border-white/10 overflow-hidden shadow-xl shadow-black/40">
+    <footer class="bg-zinc-900/50 border-t border-white/5 py-24 mt-24">
+      <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-16 text-center md:text-left">
+        <div class="space-y-8 max-w-sm">
+          <div class="flex flex-col md:flex-row items-center gap-8">
+            <div class="size-20 rounded-xl bg-zinc-800 border border-white/10 overflow-hidden shadow-2xl">
               <img v-if="project.logo" :src="project.logo" class="size-full object-cover" />
             </div>
             <div>
               <h4 class="text-2xl font-black text-white italic uppercase tracking-tighter">{{ project.title }}</h4>
-              <p class="text-gray-400 font-medium tracking-wide mt-1">{{ project.description }}</p>
+              <p class="text-gray-500 font-medium tracking-wide mt-2 leading-relaxed">{{ project.description }}</p>
             </div>
           </div>
-          <div class="space-y-3 pt-4 border-t border-white/5">
-            <p v-if="project.address" class="flex items-center justify-center md:justify-start gap-3 text-gray-300 font-medium">
-              <UIcon name="i-heroicons-map-pin" class="size-5 text-emerald-500" />
+          <div class="space-y-4 pt-6 border-t border-white/5">
+            <p v-if="project.address" class="flex items-center justify-center md:justify-start gap-4 text-gray-400 font-bold text-xs uppercase tracking-widest">
+              <UIcon name="i-heroicons-map-pin" class="size-5 text-emerald-500/50" />
               {{ project.address }}
             </p>
-            <p v-if="project.phone" class="flex items-center justify-center md:justify-start gap-3 text-gray-300 font-medium">
-              <UIcon name="i-heroicons-phone" class="size-5 text-emerald-500" />
+            <p v-if="project.phone" class="flex items-center justify-center md:justify-start gap-4 text-gray-400 font-bold text-xs uppercase tracking-widest">
+              <UIcon name="i-heroicons-phone" class="size-5 text-emerald-500/50" />
               <a :href="`tel:${project.phone}`" class="hover:text-emerald-400 transition-colors">{{ project.phone }}</a>
             </p>
           </div>
         </div>
         
-        <div class="flex flex-col items-center md:items-end gap-6">
-          <div class="flex gap-4">
+        <div class="flex flex-col items-center md:items-end gap-8">
+          <div class="flex gap-5">
             <UButton 
               v-if="project.website" 
               :to="project.website" 
               target="_blank" 
               icon="i-heroicons-globe-alt" 
               color="neutral" 
-              variant="ghost" 
+              variant="soft" 
               size="lg"
-              class="hover:bg-emerald-500/10 hover:text-emerald-400"
+              class="rounded-xl hover:bg-emerald-500/10 hover:text-emerald-400"
             />
           </div>
-          <p class="text-xs font-black uppercase tracking-[0.2em] text-gray-600">
+          <p class="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600">
             Powered by SkyMenu
           </p>
         </div>

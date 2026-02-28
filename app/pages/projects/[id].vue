@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import QrcodeVue from 'qrcode.vue'
 import { projectsRepository } from '~/repositories/projects'
 import { categoriesRepository } from '~/repositories/categories'
 import { menusRepository } from '~/repositories/menus'
@@ -40,7 +41,7 @@ const tabs = [
 const { data: project, refresh: refreshProject } = await useAsyncData(`project-${id.value}`, () => projectsRepo.getProjectById(id.value))
 const { data: categories, refresh: refreshCategories } = await useAsyncData(`categories-${id.value}`, () => categoriesRepo.getCategoriesByProjectId(id.value))
 
-const menu = computed(() => project.value?.menu)
+const menu = computed(()   => project.value?.menu)
 
 const state = reactive({
   title: project.value?.title || '',
@@ -69,6 +70,34 @@ watch(project, (newVal) => {
     state.menuUIType = newVal.menuUIType || 'one'
   }
 }, { immediate: true })
+
+const publicMenuUrl = computed(() => {
+  if (!project.value?.slug) return ''
+  if (process.client) {
+    return `${window.location.origin}/menu/${project.value.slug}`
+  }
+  return `/menu/${project.value.slug}`
+})
+
+const copyMenuLink = async () => {
+  try {
+    await navigator.clipboard.writeText(publicMenuUrl.value)
+    toast.add({ title: 'Link copied to clipboard!', color: 'success' })
+  } catch (err) {
+    toast.add({ title: 'Failed to copy link.', color: 'error' })
+  }
+}
+
+const downloadQRCode = () => {
+  const canvas = document.querySelector('#qr-code-canvas canvas') as HTMLCanvasElement
+  if (!canvas) return
+  
+  const link = document.createElement('a')
+  link.download = `${project.value?.slug}-qr-code.png`
+  link.href = canvas.toDataURL('image/png')
+  link.click()
+  toast.add({ title: 'QR Code downloaded!', color: 'success' })
+}
 
 async function onSubmit(event: { data: TUpdateProjectValidationSchema }) {
   try {
@@ -156,17 +185,17 @@ const goToCategories = () => {
 <template>
   <div class="space-y-10 pb-20 w-full">
     <!-- Header Section (Premium) -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
-      <div class="flex items-center gap-6">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 px-4">
+      <div class="flex items-center gap-8">
         <UButton
           icon="i-heroicons-arrow-left"
           variant="soft"
           color="neutral"
-          class="rounded-2xl p-3 shadow-lg shadow-black/5 active:scale-95 transition-all"
+          class="rounded-xl p-3.5 shadow-sm active:scale-95 transition-all"
           @click="router.push('/projects')"
         />
         <div class="relative group">
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-5">
              <h1 class="text-3xl md:text-5xl font-black text-white dark:text-white light:text-gray-900 tracking-tight leading-none group-hover:text-emerald-400 transition-colors">
               {{ project?.title }}
             </h1>
@@ -176,18 +205,18 @@ const goToCategories = () => {
               class="rounded-lg font-black tracking-tighter uppercase px-3 py-1.5 backdrop-blur-md"
             />
           </div>
-          <p class="text-gray-500 font-bold uppercase tracking-widest text-[10px] mt-2 pl-1">Project Management Dashboard</p>
+          <p class="text-gray-500 font-bold uppercase tracking-[0.3em] text-[10px] mt-2.5 pl-1">Project Management Dashboard</p>
         </div>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-4">
         <UButton
           v-if="project?.isPublished"
           :to="`/menu/${project.slug}`"
           target="_blank"
           icon="i-heroicons-eye"
-          color="emerald"
+          color="success"
           variant="soft"
-          class="rounded-[18px] font-black px-6 py-3 shadow-emerald-500/5 transition-all"
+          class="rounded-xl font-black px-6 py-3.5 transition-all"
           label="Live Preview"
         />
         <UPopconfirm title="Delete Project?" description="This will permanently remove this project and all its data." @confirm="deleteProject">
@@ -195,33 +224,33 @@ const goToCategories = () => {
             icon="i-heroicons-trash"
             color="error"
             variant="soft"
-            class="rounded-[18px] font-bold p-3"
+            class="rounded-xl font-bold p-3.5"
           />
         </UPopconfirm>
         <UButton
           :label="isEditing ? 'Cancel Edit' : 'Settings'"
           :icon="isEditing ? 'i-heroicons-x-mark' : 'i-heroicons-cog-6-tooth'"
           :variant="isEditing ? 'ghost' : 'solid'"
-          class="rounded-[18px] font-black px-6 py-3 bg-white dark:bg-white light:bg-gray-900 dark:text-black light:text-white hover:bg-emerald-400 dark:hover:bg-emerald-400 light:hover:bg-emerald-600 transition-all shadow-xl shadow-black/20"
+          class="rounded-xl font-black px-7 py-3.5 bg-white dark:bg-white light:bg-gray-900 dark:text-black light:text-white hover:bg-emerald-400 dark:hover:bg-emerald-400 light:hover:bg-emerald-600 transition-all shadow-xl shadow-black/20"
           @click="isEditing = !isEditing"
         />
       </div>
     </div>
 
     <!-- Layout Container -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
       
       <!-- Left Overlay Column: Identity Card -->
-      <div class="lg:col-span-4 space-y-8">
-        <div class="p-[1px] rounded-[40px] bg-gradient-to-br from-white/10 via-transparent to-transparent shadow-2xl">
-          <div class="bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white rounded-[39px] overflow-hidden backdrop-blur-3xl">
+      <div class="lg:col-span-4 space-y-10">
+        <div class="p-[1px] rounded-3xl bg-gradient-to-br from-white/10 via-transparent to-transparent shadow-2xl">
+          <div class="bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white rounded-[23px] overflow-hidden backdrop-blur-3xl">
             <!-- Cover Art -->
-            <div class="relative h-60 w-full overflow-hidden shrink-0 group/cover">
-              <img v-if="project?.coverImage" :src="project.coverImage" class="h-full w-full object-cover transition-transform duration-1000 group-hover/cover:scale-110 opacity-60" />
+            <div class="relative h-64 w-full overflow-hidden shrink-0 group/cover border-b border-white/5">
+              <img v-if="project?.coverImage" :src="project.coverImage" class="h-full w-full object-cover transition-transform duration-[3000ms] group-hover/cover:scale-110 opacity-60" />
               <div class="absolute inset-0 bg-gradient-to-t from-[#0d0d0f] via-transparent to-transparent" />
               
-              <div class="absolute -bottom-10 left-8 z-10 transition-transform duration-500 group-hover/cover:translate-y-[-4px]">
-                <div class="size-24 rounded-3xl bg-zinc-900 border-[6px] border-zinc-950 dark:border-zinc-950 light:border-white shadow-2xl overflow-hidden">
+              <div class="absolute -bottom-12 left-8 z-10 transition-transform duration-500 group-hover/cover:translate-y-[-4px]">
+                <div class="size-28 rounded-2xl bg-zinc-900 border-[8px] border-zinc-950 dark:border-zinc-950 light:border-white shadow-2xl overflow-hidden">
                   <img v-if="project?.logo" :src="project.logo" class="size-full object-cover" />
                   <div v-else class="size-full flex items-center justify-center">
                     <UIcon name="i-heroicons-photo" class="size-10 text-gray-700/50" />
@@ -265,6 +294,50 @@ const goToCategories = () => {
           </div>
         </div>
 
+        <!-- Digital Access (QR Code) - REFINED -->
+        <div class="p-[1px] rounded-[40px] bg-gradient-to-br from-white/10 to-transparent shadow-2xl">
+          <div class="bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white rounded-[39px] p-8 space-y-8 flex flex-col items-center text-center">
+            <div class="space-y-2">
+              <h3 class="text-xl font-black text-white dark:text-white light:text-gray-900 uppercase tracking-tighter">Digital Access</h3>
+              <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest leading-none">Scanning opens live menu</p>
+            </div>
+
+            <div class="relative group/qr">
+               <div class="p-4 rounded-[40px] bg-white shadow-2xl transition-transform duration-500 group-hover/qr:scale-105 active:scale-95 cursor-pointer" id="qr-code-canvas">
+                  <QrcodeVue
+                    :value="publicMenuUrl"
+                    :size="160"
+                    level="H"
+                    render-as="canvas"
+                    foreground="#0d0d0f"
+                    background="#ffffff"
+                  />
+               </div>
+               <!-- Animated border overlay -->
+               <div class="absolute -inset-2 border-2 border-dashed border-emerald-500/20 rounded-[48px] animate-[spin_20s_linear_infinite]" />
+            </div>
+
+            <div class="w-full space-y-3">
+              <UButton
+                icon="i-heroicons-arrow-down-tray"
+                label="Download QR Code"
+                color="neutral"
+                variant="soft"
+                class="w-full rounded-2xl font-black py-4 transition-all hover:bg-emerald-500/10 hover:text-emerald-400 active:scale-95"
+                @click="downloadQRCode"
+              />
+              <UButton
+                icon="i-heroicons-link"
+                label="Copy Menu Link"
+                color="neutral"
+                variant="ghost"
+                class="w-full rounded-2xl font-bold py-3 text-xs opacity-60 hover:opacity-100 transition-all"
+                @click="copyMenuLink"
+              />
+            </div>
+          </div>
+        </div>
+
         <!-- Quick Activity Stats (Refined) -->
         <div class="grid grid-cols-2 gap-4">
            <div class="group p-6 rounded-[28px] bg-white/[0.02] dark:bg-white/[0.02] light:bg-white border border-white/[0.05] dark:border-white/[0.05] light:border-gray-200 text-center transition-all hover:bg-emerald-500/5 hover:border-emerald-500/20 cursor-default">
@@ -281,7 +354,7 @@ const goToCategories = () => {
       <!-- Right Column: Tabs Content (Premium Layout) -->
       <div class="lg:col-span-8">
         <div class="mb-4">
-             <UTabs v-model="activeTab" :items="tabs" class="w-full" :ui="{ list: { rounded: 'rounded-2xl', background: 'bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-100', marker: 'bg-emerald-400 dark:bg-emerald-400 light:bg-emerald-500', tab: { active: 'text-black dark:text-black light:text-white font-black' } } }">
+             <UTabs v-model="activeTab" :items="tabs" class="w-full" :ui="{ list: { base: 'rounded-2xl py-2', background: 'bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-100', marker: { base: 'bg-emerald-400 dark:bg-emerald-400 light:bg-emerald-500 rounded-xl' } } }">
                 <template #info>
                     <div class="mt-8 space-y-6 animate-fade-in">
                        <div class="p-[1px] rounded-[32px] bg-gradient-to-br from-white/10 to-transparent">
@@ -355,7 +428,7 @@ const goToCategories = () => {
                                <h3 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Menu Architecture</h3>
                                <p class="text-sm text-gray-500 font-medium">Categorize your offerings for effortless browsing.</p>
                            </div>
-                           <UButton icon="i-heroicons-plus-circle" label="New Category" color="emerald" class="rounded-xl font-black px-6 active:scale-95 transition-all shadow-lg shadow-emerald-500/10" @click="openAddCategory" />
+                           <UButton icon="i-heroicons-plus-circle" label="New Category" color="success" class="rounded-xl font-black px-6 active:scale-95 transition-all shadow-lg shadow-emerald-500/10" @click="openAddCategory" />
                        </div>
 
                        <div v-if="categories?.length" class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
@@ -389,7 +462,7 @@ const goToCategories = () => {
                            </div>
                            <h4 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Empty Architecture</h4>
                            <p class="text-gray-500 font-medium max-w-sm mt-3 leading-relaxed">Let's build your menu structure. Create categories to start organizing your culinary items.</p>
-                           <UButton icon="i-heroicons-plus" label="Build First Category" color="emerald" class="mt-10 rounded-xl font-black px-10 active:scale-95 transition-all" @click="openAddCategory" />
+                           <UButton icon="i-heroicons-plus" label="Build First Category" color="success" class="mt-10 rounded-xl font-black px-10 active:scale-95 transition-all" @click="openAddCategory" />
                        </div>
                     </div>
                 </template>
@@ -405,7 +478,7 @@ const goToCategories = () => {
                                <UButton
                                  icon="i-heroicons-plus-circle"
                                  label="New Item"
-                                 color="emerald"
+                                 color="success"
                                  class="rounded-xl font-black px-6 active:scale-95 transition-all shadow-lg shadow-emerald-500/10"
                                  :disabled="!categories?.length"
                                  @click="openAddItem"
@@ -456,7 +529,7 @@ const goToCategories = () => {
                                  v-if="categories?.length"
                                  icon="i-heroicons-plus"
                                  label="Cook First Item"
-                                 color="emerald"
+                                 color="success"
                                  class="mt-10 rounded-xl font-black px-10 active:scale-95 transition-all"
                                  @click="openAddItem"
                                />
@@ -477,7 +550,7 @@ const goToCategories = () => {
                            </div>
                            <h4 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Main Menu Required</h4>
                            <p class="text-gray-500 font-medium max-w-sm mt-3 leading-relaxed">This project is not yet initialized. We need to create the main menu core before adding items.</p>
-                           <UButton label="Initialize Gastronomy" color="emerald" class="mt-10 rounded-xl font-black px-10 :loading=loading active:scale-95 transition-all shadow-lg shadow-emerald-500/10" @click="createMenu" />
+                           <UButton label="Initialize Gastronomy" color="success" class="mt-10 rounded-xl font-black px-10 :loading=loading active:scale-95 transition-all shadow-lg shadow-emerald-500/10" @click="createMenu" />
                         </div>
                     </div>
                 </template>
@@ -581,7 +654,7 @@ const goToCategories = () => {
                   v-for="type in ['one', 'two', 'three']" 
                   :key="type"
                   class="relative cursor-pointer transition-all active:scale-95"
-                  @click="state.menuUIType = type"
+                  @click="state.menuUIType = type as 'one' | 'two' | 'three'"
                 >
                   <div 
                     class="p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-3 bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-50"
