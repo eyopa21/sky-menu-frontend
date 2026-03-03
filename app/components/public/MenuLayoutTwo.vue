@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PageFlip } from 'page-flip'
 import type { Project } from '~/repositories/projects/response/projects'
 import type { MenuItem } from '~/repositories/menu-items/response/menu-items'
 import type { Category } from '~/repositories/categories/response/categories'
@@ -13,244 +14,277 @@ const emit = defineEmits<{
   (e: 'openItemDetail', item: MenuItem): void
 }>()
 
-const activeCategory = ref<number | null>(null)
+const bookContainer = ref<HTMLElement | null>(null)
+let flipbook: any = null
 
-const categoriesWithItems = computed(() => {
-  return props.categories?.filter(cat => 
-    props.menuItemsByCategory && props.menuItemsByCategory[cat.id]?.length > 0
-  ) || []
+// Logic to chunk items into pages (e.g., 3-4 items per page for premium feel)
+const pages = computed(() => {
+  const result: any[] = []
+  
+  // Page 1: Cover
+  result.push({ type: 'cover' })
+
+  // Page 2: intro
+  result.push({ type: 'intro' })
+
+  // Categories & Items
+  props.categories?.forEach(cat => {
+    const items = props.menuItemsByCategory[cat.id] || []
+    if (items.length === 0) return
+
+    // Add Category Header Page or Start
+    // For simplicity, let's group by category and chunk items
+    const chunkSize = 3
+    for (let i = 0; i < items.length; i += chunkSize) {
+      result.push({
+        type: 'items',
+        category: cat,
+        items: items.slice(i, i + chunkSize),
+        isFirstInCat: i === 0
+      })
+    }
+  })
+
+  // Final Page: Contact
+  result.push({ type: 'contact' })
+  
+  return result
 })
 
-onMounted(() => {
-  if (categoriesWithItems.value?.length > 0) {
-    activeCategory.value = categoriesWithItems.value[0]?.id
+onMounted(async () => {
+  if (import.meta.client && bookContainer.value) {
+    await nextTick()
+    
+    flipbook = new PageFlip(bookContainer.value, {
+      width: 550,
+      height: 733,
+      size: 'stretch',
+      minWidth: 315,
+      maxWidth: 1000,
+      minHeight: 420,
+      maxHeight: 1350,
+      maxShadowOpacity: 0.5,
+      showCover: true,
+      mobileScrollSupport: false,
+      usePortrait: true,
+      startPage: 0
+    })
+
+    flipbook.loadFromHTML(document.querySelectorAll('.page'))
   }
 })
 
-const scrollToCategory = (categoryId: number) => {
-  activeCategory.value = categoryId
-  const el = document.getElementById(`category-${categoryId}`)
-  if (el) {
-    const yOffset = -100 
-    const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset
-    window.scrollTo({ top: y, behavior: 'smooth' })
+onUnmounted(() => {
+  if (flipbook) {
+    flipbook.destroy()
   }
-}
+})
+
+const flipNext = () => flipbook?.flipNext()
+const flipPrev = () => flipbook?.flipPrev()
 </script>
 
 <template>
-  <div class="min-h-screen bg-zinc-950 text-white font-sans selection:bg-emerald-500/30">
-    <!-- Hero Section -->
-    <header class="relative h-[40vh] md:h-[50vh] overflow-hidden">
-      <img 
-        v-if="project.coverImage" 
-        :src="project.coverImage" 
-        class="absolute inset-0 w-full h-full object-cover scale-105"
-      />
-      <div v-else class="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900" />
+  <div class="min-h-screen bg-[#0a0a0b] flex flex-col items-center justify-center py-10 px-4 overflow-hidden selection:bg-emerald-500/30 font-sans">
+    
+    <!-- Flipbook Container -->
+    <div class="relative w-full max-w-6xl aspect-[1.5/1] flex flex-col items-center">
       
-      <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
-      
-      <div class="absolute inset-0 flex flex-col items-center justify-end pb-12 px-4 text-center">
-        <div class="size-24 md:size-32 rounded-2xl bg-zinc-900 border-4 border-zinc-950 overflow-hidden shadow-2xl mb-6 group transition-transform hover:scale-105 duration-500">
-          <img v-if="project.logo" :src="project.logo" class="size-full object-cover" />
-          <div v-else class="size-full flex items-center justify-center bg-zinc-800">
-            <h1 class="text-4xl font-bold text-white/20">{{ project.title.charAt(0) }}</h1>
-          </div>
-        </div>
-        <h1 class="text-4xl md:text-5xl font-black text-white tracking-tight mb-2 uppercase italic drop-shadow-lg">
-          {{ project.title }}
-        </h1>
-        <p class="text-lg text-gray-300 max-w-lg font-medium drop-shadow-md mb-6">
-          {{ project.description }}
-        </p>
-
-        <!-- Quick Contacts in Header -->
-        <div class="flex flex-wrap justify-center gap-4 text-sm font-bold uppercase tracking-widest text-white/60">
-          <a v-if="project.phone" :href="`tel:${project.phone}`" class="flex items-center gap-2 hover:text-white transition-colors bg-white/5 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/10">
-            <UIcon name="i-heroicons-phone" class="size-4" />
-            <span>Call</span>
-          </a>
-          <a v-if="project.address" :href="`https://maps.google.com/?q=${project.address}`" target="_blank" class="flex items-center gap-2 hover:text-white transition-colors bg-white/5 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/10">
-            <UIcon name="i-heroicons-map-pin" class="size-4" />
-            <span>Map</span>
-          </a>
-          <a v-if="project.website" :href="project.website" target="_blank" class="flex items-center gap-2 hover:text-white transition-colors bg-white/5 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/10">
-            <UIcon name="i-heroicons-globe-alt" class="size-4" />
-            <span>Web</span>
-          </a>
-        </div>
-      </div>
-    </header>
-
-    <!-- Sticky Navigation -->
-    <nav class="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 py-4 overflow-x-auto no-scrollbar scroll-smooth shadow-2xl shadow-black/40">
-      <div class="flex items-center gap-3 px-4 max-w-5xl mx-auto min-w-max">
-        <button
-          v-for="cat in categoriesWithItems"
-          :key="cat.id"
-          class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 border"
-          :class="activeCategory === cat.id 
-            ? 'shadow-lg shadow-emerald-500/20 scale-105' 
-            : 'bg-white/5 text-gray-400 border-transparent hover:bg-white/10 hover:text-white'"
-          :style="activeCategory === cat.id ? { 
-            backgroundColor: project.primaryColor || '#10b981',
-            borderColor: project.primaryColor || '#10b981',
-            color: '#fff'
-          } : {}"
-          @click="scrollToCategory(cat.id)"
-        >
-          {{ cat.name }}
-        </button>
-      </div>
-    </nav>
-
-    <!-- Menu Content -->
-    <main class="max-w-5xl mx-auto px-6 py-16 space-y-20">
-      <section 
-        v-for="cat in categoriesWithItems" 
-        :id="`category-${cat.id}`" 
-        :key="cat.id"
-        class="space-y-10 scroll-mt-24"
-      >
-        <div class="flex items-center gap-5">
-          <div 
-            class="h-12 w-1.5 rounded-full" 
-            :style="{ backgroundColor: project.primaryColor || '#10b981' }"
-          />
-          <div>
-            <h2 class="text-4xl font-black text-white uppercase tracking-tighter italic">
-              {{ cat.name }}
-            </h2>
-            <p v-if="cat.description" class="text-gray-500 text-[10px] mt-1.5 uppercase tracking-widest font-black opacity-60">
-              {{ cat.description }}
-            </p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div 
-            v-for="item in menuItemsByCategory[cat.id]" 
-            :key="item.id"
-            @click="emit('openItemDetail', item)"
-            class="group bg-zinc-900/40 border border-white/5 rounded-2xl overflow-hidden hover:bg-zinc-900/60 hover:border-white/10 transition-all duration-500 hover:-translate-y-1 shadow-2xl hover:shadow-black/60 cursor-pointer"
-          >
-            <div class="relative aspect-[4/3] overflow-hidden bg-zinc-800">
-              <img 
-                v-if="item.images?.length" 
-                :src="item.images[0]" 
-                class="size-full object-cover group-hover:scale-110 transition-transform duration-700"
-              />
-              <div v-else class="size-full flex items-center justify-center">
-                <UIcon name="i-heroicons-photo" class="size-16 text-zinc-700" />
-              </div>
-              
-              <div class="absolute top-5 right-5 bg-zinc-950/90 backdrop-blur-xl px-4 py-2 rounded-xl border border-white/10 shadow-2xl">
-                <span class="text-lg font-black font-mono tracking-tighter" :style="{ color: project.accentColor || '#3b82f6' }">
-                  {{ project.currency }} {{ item.price }}
-                </span>
-              </div>
-
-              <div v-if="!item.isAvailable" class="absolute inset-0 bg-zinc-950/60 backdrop-blur-[2px] flex items-center justify-center">
-                <span class="px-6 py-2 bg-red-500/90 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-lg shadow-2xl scale-110">
-                  Sold Out
-                </span>
-              </div>
-            </div>
-
-            <div class="p-8 space-y-4">
-              <div class="flex items-start justify-between gap-2">
-                <h3 
-                  class="text-xl font-black text-white transition-colors duration-300 leading-tight group-hover:text-[var(--hover-color)]"
-                  :style="{ '--hover-color': project.primaryColor || '#10b981' }"
-                >
-                  {{ item.name }}
-                </h3>
-              </div>
-              <p class="text-gray-400 text-sm line-clamp-2 leading-relaxed font-medium opacity-80">
-                {{ item.description }}
-              </p>
-              
-              <!-- Tags on Card -->
-              <div v-if="item.tags?.length" class="flex flex-wrap gap-2 pt-2">
-                <span 
-                  v-for="tag in item.tags.slice(0, 2)" 
-                  :key="tag"
-                  class="text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg bg-white/5 text-white/40 border border-white/5"
-                >
-                  {{ tag }}
-                </span>
-              </div>
-
-              <div class="pt-6 flex items-center gap-5 text-[10px] font-black uppercase tracking-widest border-t border-white/5" :style="{ color: project.accentColor || '#6b7280' }">
-                <div v-if="item.calories" class="flex items-center gap-2 transition-colors hover:text-[var(--hover-accent)]" :style="{ '--hover-accent': project.accentColor || '#10b981' }">
-                  <UIcon name="i-heroicons-fire" class="size-4" />
-                  <span>{{ item.calories }} kcal</span>
-                </div>
-                <div v-if="item.preparationTime" class="flex items-center gap-2 transition-colors hover:text-[var(--hover-accent)]" :style="{ '--hover-accent': project.accentColor || '#10b981' }">
-                  <UIcon name="i-heroicons-clock" class="size-4" />
-                  <span>{{ item.preparationTime }} min</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Footer / Contact -->
-    <footer class="bg-zinc-900/50 border-t border-white/5 py-24 mt-24">
-      <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-16 text-center md:text-left">
-        <div class="space-y-8 max-w-sm">
-          <div class="flex flex-col md:flex-row items-center gap-8">
-            <div class="size-20 rounded-xl bg-zinc-800 border border-white/10 overflow-hidden shadow-2xl">
-              <img v-if="project.logo" :src="project.logo" class="size-full object-cover" />
-            </div>
-            <div>
-              <h4 class="text-2xl font-black text-white italic uppercase tracking-tighter">{{ project.title }}</h4>
-              <p class="text-gray-500 font-medium tracking-wide mt-2 leading-relaxed">{{ project.description }}</p>
-            </div>
-          </div>
-          <div class="space-y-4 pt-6 border-t border-white/5">
-            <p v-if="project.address" class="flex items-center justify-center md:justify-start gap-4 text-gray-400 font-bold text-xs uppercase tracking-widest">
-              <UIcon name="i-heroicons-map-pin" class="size-5 text-emerald-500/50" />
-              {{ project.address }}
-            </p>
-            <p v-if="project.phone" class="flex items-center justify-center md:justify-start gap-4 text-gray-400 font-bold text-xs uppercase tracking-widest">
-              <UIcon name="i-heroicons-phone" class="size-5 text-emerald-500/50" />
-              <a :href="`tel:${project.phone}`" class="hover:text-emerald-400 transition-colors">{{ project.phone }}</a>
-            </p>
-          </div>
-        </div>
+      <div ref="bookContainer" class="flipbook shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)] rounded-lg overflow-hidden">
         
-        <div class="flex flex-col items-center md:items-end gap-8">
-          <div class="flex gap-5">
-            <UButton 
-              v-if="project.website" 
-              :to="project.website" 
-              target="_blank" 
-              icon="i-heroicons-globe-alt" 
-              color="neutral" 
-              variant="soft" 
-              size="lg"
-              class="rounded-xl hover:bg-emerald-500/10 hover:text-emerald-400"
-            />
-          </div>
-          <p class="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600">
-            Powered by SkyMenu
-          </p>
+        <!-- COVER PAGE -->
+        <div class="page page-cover bg-zinc-900 overflow-hidden relative" data-density="hard">
+           <div class="absolute inset-0">
+             <img v-if="project.coverImage" :src="project.coverImage" class="size-full object-cover opacity-30 blur-sm scale-110" />
+             <div class="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/80 to-zinc-950" />
+           </div>
+           
+           <div class="relative h-full flex flex-col items-center justify-center p-12 text-center">
+              <div class="size-32 rounded-[2rem] bg-zinc-800 border-4 border-white/5 shadow-2xl mb-12 overflow-hidden rotate-3">
+                 <img v-if="project.logo" :src="project.logo" class="size-full object-cover" />
+              </div>
+              <h1 class="text-5xl font-black text-white italic uppercase tracking-tighter leading-none mb-4 drop-shadow-2xl">
+                {{ project.title }}
+              </h1>
+              <div class="w-16 h-1 bg-emerald-500/50 rounded-full mb-8" />
+              <p class="text-xs font-black text-gray-400 uppercase tracking-[0.4em] opacity-60">Digital Experience</p>
+           </div>
+           
+           <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3 animate-bounce">
+              <UIcon name="i-heroicons-hand-raised" class="size-5 text-emerald-500/40" />
+              <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">Flip to open</span>
+           </div>
         </div>
+
+        <!-- INTRO PAGE -->
+        <div class="page bg-[#fdfcfb] text-zinc-900 border-l border-zinc-200 shadow-inner">
+           <div class="p-16 h-full flex flex-col justify-center text-center space-y-10">
+              <div class="space-y-4">
+                 <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-600">Our Story</h2>
+                 <p class="text-xl font-medium leading-[1.8] text-zinc-600 italic">
+                   "{{ project.description }}"
+                 </p>
+              </div>
+              <div class="h-[1px] w-24 bg-zinc-200 mx-auto" />
+              <div class="grid grid-cols-2 gap-8 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                 <div>
+                    <p class="mb-2 text-zinc-300">Contact</p>
+                    <p class="text-zinc-900">{{ project.phone }}</p>
+                 </div>
+                 <div>
+                    <p class="mb-2 text-zinc-300">Location</p>
+                    <p class="text-zinc-900 truncate px-4">{{ project.address }}</p>
+                 </div>
+              </div>
+           </div>
+        </div>
+
+        <!-- CONTENT PAGES -->
+        <div v-for="(p, idx) in pages.filter(x => x.type === 'items')" :key="idx" class="page bg-[#fdfcfb] text-zinc-900 border-l border-zinc-200 shadow-inner relative">
+           <div class="p-12 h-full flex flex-col">
+              
+              <!-- Category Header -->
+              <div v-if="p.isFirstInCat" class="mb-10 pt-4">
+                 <h2 class="text-4xl font-black italic uppercase tracking-tighter leading-none" :style="{ color: project.primaryColor || '#10b981' }">
+                   {{ p.category.name }}
+                 </h2>
+                 <div class="h-1 w-12 bg-zinc-200 mt-4 rounded-full" />
+              </div>
+              <div v-else class="mb-14" />
+
+              <!-- Items List -->
+              <div class="flex-1 space-y-12">
+                 <div 
+                   v-for="item in p.items" 
+                   :key="item.id" 
+                   class="group flex gap-6 items-start cursor-pointer transition-transform active:scale-95" 
+                   @click="emit('openItemDetail', item)"
+                 >
+                    <div class="relative size-24 shrink-0 rounded-2xl overflow-hidden border border-zinc-100 shadow-lg grayscale-[20%] group-hover:grayscale-0 transition-all duration-500">
+                       <img v-if="item.images?.length" :src="item.images[0]" class="size-full object-cover transition-transform group-hover:scale-110" />
+                       <div v-else class="size-full bg-zinc-50 flex items-center justify-center">
+                          <UIcon name="i-heroicons-cake" class="size-10 text-zinc-200" />
+                       </div>
+                       <div v-if="!item.isAvailable" class="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
+                          <span class="text-[7px] font-black uppercase bg-red-500 text-white px-2 py-0.5 rounded shadow-sm">Sold Out</span>
+                       </div>
+                    </div>
+                    
+                    <div class="flex-1 min-w-0 pt-1">
+                       <div class="flex items-center justify-between mb-2">
+                          <h4 class="text-lg font-black uppercase tracking-tight leading-none group-hover:text-emerald-700 transition-colors">{{ item.name }}</h4>
+                          <span class="text-sm font-black font-mono tracking-tighter text-zinc-400 group-hover:text-emerald-600 transition-colors">{{ project.currency }} {{ item.price }}</span>
+                       </div>
+                       <p class="text-[11px] text-zinc-400 leading-relaxed line-clamp-2 font-medium">
+                          {{ item.description }}
+                       </p>
+                    </div>
+                 </div>
+              </div>
+
+              <!-- Page Number -->
+              <div class="mt-auto pt-8 flex items-center justify-center border-t border-zinc-100 text-[9px] font-black uppercase tracking-[0.3em] text-zinc-300">
+                 Page {{ idx + 1 }}
+              </div>
+           </div>
+        </div>
+
+        <!-- CONTACT / BACK COVER -->
+        <div class="page bg-zinc-900 overflow-hidden relative" data-density="hard">
+           <div class="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
+              <div class="size-16 rounded-xl bg-zinc-800 border border-white/5 mb-8 overflow-hidden grayscale opacity-50">
+                 <img v-if="project.logo" :src="project.logo" class="size-full object-cover" />
+              </div>
+              <h2 class="text-2xl font-black text-white italic uppercase tracking-tighter opacity-80 mb-12">
+                Thank You
+              </h2>
+              
+              <div class="space-y-6">
+                 <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-3">
+                    <UIcon name="i-heroicons-globe-alt" class="size-4" />
+                    <span>www.{{ project.slug }}.sky-menu.app</span>
+                 </div>
+                 <div class="text-[10px] font-black text-emerald-500/50 uppercase tracking-[0.3em]">
+                    Powered by SkyMenu
+                 </div>
+              </div>
+           </div>
+        </div>
+
       </div>
-    </footer>
+
+      <!-- Controls -->
+      <div class="mt-12 flex items-center gap-12">
+         <button @click="flipPrev" class="size-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-white group active:scale-95 shadow-2xl">
+            <UIcon name="i-heroicons-chevron-left" class="size-6 transition-transform group-hover:-translate-x-1" />
+         </button>
+         
+         <div class="flex flex-col items-center text-center">
+            <div class="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-2">Interact</div>
+            <div class="flex gap-2">
+               <div class="size-1 rounded-full bg-emerald-500" />
+               <div class="size-1 rounded-full bg-white/20" />
+               <div class="size-1 rounded-full bg-white/20" />
+            </div>
+         </div>
+
+         <button @click="flipNext" class="size-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-white group active:scale-95 shadow-2xl">
+            <UIcon name="i-heroicons-chevron-right" class="size-6 transition-transform group-hover:translate-x-1" />
+         </button>
+      </div>
+
+    </div>
+
   </div>
 </template>
 
 <style scoped>
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+.flipbook {
+  background-color: transparent;
 }
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+
+.page {
+  width: 550px;
+  height: 733px;
+  background-color: #fdfcfb;
+  box-shadow: inset 0 0 100px rgba(0,0,0,0.02);
+}
+
+.page-cover {
+  background-color: #18181b !important;
+  border-left: 15px solid #000;
+}
+
+/* Realistic Paper Gradient */
+.page:not(.page-cover)::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 5%, rgba(0,0,0,0) 95%, rgba(0,0,0,0.05) 100%);
+  pointer-events: none;
+}
+
+.page:not(.page-cover)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* Animation for the bounce icon */
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.animate-bounce {
+  animation: bounce-subtle 2s infinite ease-in-out;
 }
 </style>
