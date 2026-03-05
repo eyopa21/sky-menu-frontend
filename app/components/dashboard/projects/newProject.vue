@@ -91,11 +91,11 @@ async function onSubmit(event: { data: TCreateProjectValidationSchema }) {
           </UFormField>
 
           <UFormField label="Logo" name="logo" required>
-            <AppFileUploader v-model="state.logo" name="logo" />
+            <AppFileUploader v-model="state.logo" name="logo" accept="image/*" />
           </UFormField>
 
           <UFormField label="Cover Image" name="coverImage">
-            <AppFileUploader v-model="state.coverImage" name="coverImage" />
+            <AppFileUploader v-model="state.coverImage" name="coverImage" accept="image/*" />
           </UFormField>
 
           <div class="flex justify-end gap-3 pt-4">

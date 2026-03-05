@@ -152,17 +152,30 @@ const removeImage = (index: number) => {
           </div>
 
           <div class="space-y-4">
-            <label class="text-sm font-medium text-white">Images</label>
-            <div class="grid grid-cols-3 gap-2 mb-2">
-              <div v-for="(img, index) in currentImages" :key="index" class="relative aspect-square rounded-lg overflow-hidden border border-white/10">
-                <img :src="img" class="size-full object-cover" />
-                <button @click.prevent="removeImage(index)" class="absolute top-1 right-1 bg-black/50 rounded-full p-0.5 hover:bg-black/80 transition-colors">
-                  <UIcon name="i-heroicons-x-mark" class="text-white size-4" />
-                </button>
+            <label class="text-sm font-medium text-white px-1">Images</label>
+            
+            <!-- Existing Images -->
+            <div v-if="currentImages.length > 0" class="grid grid-cols-3 gap-3">
+              <div v-for="(img, index) in currentImages" :key="img" class="group relative aspect-square rounded-xl overflow-hidden border border-white/10 bg-zinc-900">
+                <img :src="img" class="size-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <UButton
+                    color="error"
+                    variant="soft"
+                    icon="i-heroicons-trash"
+                    size="sm"
+                    class="rounded-full !p-2"
+                    @click.prevent="removeImage(index)"
+                  />
+                </div>
+                <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-black/50 backdrop-blur-md rounded text-[9px] text-zinc-300 border border-white/5">
+                  Existing
+                </div>
               </div>
             </div>
-            <AppFileUploader v-model:files="imageFiles" name="menu-item-images" multiple />
-            <p class="text-xs text-gray-400">At least one image is required to publish this item.</p>
+
+            <AppFileUploader v-model:files="imageFiles" name="menu-item-images" multiple accept="image/*" />
+            <p class="text-[11px] text-zinc-500 px-1">At least one image is required to publish this item. You can select multiple files.</p>
           </div>
         </div>
       </UForm>

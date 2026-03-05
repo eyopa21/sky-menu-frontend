@@ -100,7 +100,8 @@ async function onSubmit(event: { data: TCategoryValidationSchema }) {
         </UFormField>
 
         <UFormField label="Category Image" name="imageUrl">
-          <div v-if="state.imageUrl && !imageFile" class="relative group aspect-video rounded-xl overflow-hidden border border-white/10 mb-4 bg-zinc-900 shadow-inner">
+          <AppFileUploader v-model="imageFile" name="category-image" accept="image/*" />
+          <div v-if="state.imageUrl && !imageFile" class="mt-4 relative group aspect-video rounded-xl overflow-hidden border border-white/10 bg-zinc-900 shadow-inner">
             <img :src="state.imageUrl" class="size-full object-cover group-hover:scale-105 transition-transform duration-500" />
             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
               <UButton
@@ -110,14 +111,13 @@ async function onSubmit(event: { data: TCategoryValidationSchema }) {
                 size="sm"
                 @click="state.imageUrl = ''"
               >
-                Remove
+                Remove Current
               </UButton>
             </div>
             <div class="absolute bottom-2 left-2 px-2 py-1 bg-black/60 backdrop-blur-md rounded text-xs text-white border border-white/10">
               Current Cover
             </div>
           </div>
-          <AppFileUploader v-model="imageFile" name="category-image" />
         </UFormField>
       </UForm>
     </template>
