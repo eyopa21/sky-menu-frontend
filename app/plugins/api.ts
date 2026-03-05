@@ -2,7 +2,7 @@ import { useAuthStore } from '~/store/auth'
 
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
-  const baseURL = config.public.restApiUrl as string || 'http://localhost:3000'
+  const baseURL = config.public.restApiUrl as string || 'https://api.mesobmenu.com'
   const authStore = useAuthStore()
 
   const api = $fetch.create({
