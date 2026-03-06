@@ -34,6 +34,7 @@ const items = ref([
       {
         label: 'Feedbacks',
         icon: 'i-heroicons-chat-bubble-left-right',
+        to: '/dashboard/feedbacks',
       },
       {
         label: 'Help Center',

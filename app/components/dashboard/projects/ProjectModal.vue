@@ -232,7 +232,7 @@ const deleteProject = async () => {
       <div class="flex justify-end gap-3 w-full p-4">
         <div class="flex-1" />
         <UButton variant="ghost" label="Dismiss" class="rounded-xl font-bold" @click="isOpen = false" />
-        <UButton type="submit" form="project-settings-form" :label="'Commit Changes'" :loading="loading" color="emerald" class="rounded-xl font-black px-8 py-3 shadow-lg shadow-emerald-500/10 active:scale-95 transition-all" />
+        <UButton type="submit" form="project-settings-form" :label="'Commit Changes'" :loading="loading" color="success" class="rounded-xl font-black px-8 py-3 shadow-lg shadow-emerald-500/10 active:scale-95 transition-all" />
       </div>
     </template>
   </USlideover>

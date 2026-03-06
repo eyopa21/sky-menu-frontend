@@ -54,9 +54,11 @@ const menuItemsByCategory = computed(() => {
 })
 
 const categoriesWithItems = computed(() => {
-  return project.value?.categories?.filter(cat => 
-    menuItemsByCategory.value[cat.id]?.length > 0
-  ) || []
+  if (!project.value?.categories) return []
+  return project.value.categories.filter(cat => {
+    const items = menuItemsByCategory.value?.[cat.id]
+    return items && items.length > 0
+  })
 })
 
 const openItemDetail = (item: MenuItem) => {
@@ -88,6 +90,17 @@ useHead({
       :project="project"
       :item="selectedItem"
     />
+
+    <!-- Floating Feedback Button -->
+    <div class="fixed bottom-8 right-8 z-40 animate-bounce-subtle">
+       <UButton 
+          icon="i-heroicons-chat-bubble-bottom-center-text" 
+          size="xl" 
+          class="rounded-full size-16 shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border-4 border-white dark:border-[#09090b]"
+          :style="{ backgroundColor: project.primaryColor || '#10b981', color: 'white' }"
+          @click="navigateTo(`/menu/${slug}/feedback`)"
+       />
+    </div>
   </div>
 </template>
 
@@ -98,5 +111,13 @@ useHead({
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-bounce-subtle {
+  animation: bounce-subtle 3s ease-in-out infinite;
 }
 </style>

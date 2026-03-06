@@ -13,6 +13,16 @@ const emit = defineEmits<{
   (e: 'openItemDetail', item: MenuItem): void
 }>()
 
+const colorMode = useColorMode()
+const isDark = computed({
+  get () {
+    return colorMode.value === 'dark'
+  },
+  set () {
+    colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+  }
+})
+
 const activeCategory = ref<number | null>(null)
 
 const categoriesWithItems = computed(() => {
@@ -39,41 +49,50 @@ const activeCategoryItems = computed(() => {
 
 <template>
   <div 
-    class="min-h-screen bg-[#f1f0ee] text-gray-900 font-sans selection:bg-opacity-20"
+    class="min-h-screen bg-[#f1f0ee] dark:bg-[#09090b] text-gray-900 dark:text-white font-sans selection:bg-opacity-20 transition-colors duration-500"
     :style="{ '--selection-bg': (project.primaryColor || '#4a3423') + '33' }"
   >
     <!-- Top Nav -->
-    <nav class="sticky top-0 z-50 bg-[#f1f0ee]/80 backdrop-blur-xl border-b border-gray-200/40 py-5">
+    <nav class="sticky top-0 z-50 bg-[#f1f0ee]/80 dark:bg-[#09090b]/80 backdrop-blur-xl border-b border-gray-200/40 dark:border-white/5 py-5 transition-colors duration-500">
       <div class="max-w-7xl mx-auto px-8 h-10 flex items-center justify-between">
         <div class="flex items-center gap-5">
-          <div class="size-11 rounded-xl overflow-hidden shadow-sm bg-zinc-800 border border-black/5">
+          <div class="size-11 rounded-xl overflow-hidden shadow-sm bg-zinc-800 border border-black/5 dark:border-white/10">
             <img v-if="project.logo" :src="project.logo" class="size-full object-cover" />
           </div>
           <span 
-            class="text-2xl font-black uppercase tracking-[-0.04em]"
-            :style="{ color: project.primaryColor || '#2d241c' }"
+            class="text-2xl font-black uppercase tracking-[-0.04em] text-gray-900 dark:text-white"
+            :style="{ color: isDark ? 'white' : (project.primaryColor || '#2d241c') }"
           >
             {{ project.title }}
           </span>
         </div>
-        <div class="flex items-center gap-10 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">
-          <a 
-            href="#" 
-            class="transition-opacity hover:opacity-70"
-            :style="{ color: project.primaryColor || '#2d241c' }"
-          >
-            Menu
-          </a>
-          <a href="#" class="hover:text-gray-900 transition-colors">About</a>
+        <div class="flex items-center gap-6">
+          <div class="flex items-center gap-10 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">
+            <a 
+              href="#" 
+              class="transition-opacity hover:opacity-70"
+              :style="{ color: isDark ? 'white' : (project.primaryColor || '#2d241c') }"
+            >
+              Menu
+            </a>
+          </div>
+          <div class="h-4 w-px bg-gray-200 dark:bg-white/10 mx-2" />
+          <UButton
+            :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
+            color="neutral"
+            variant="ghost"
+            class="rounded-xl"
+            @click="isDark = !isDark"
+          />
         </div>
       </div>
     </nav>
 
     <main class="max-w-7xl mx-auto px-8 py-8 space-y-16">
       <!-- Hero Banner -->
-      <section class="relative h-[440px] rounded-[32px] overflow-hidden shadow-[0_24px_48px_-12px_rgba(0,0,0,0.12)] group">
+      <section class="relative h-[440px] rounded-[32px] overflow-hidden shadow-[0_24px_48px_-12px_rgba(0,0,0,0.12)] group border border-transparent dark:border-white/5">
         <img v-if="project.coverImage" :src="project.coverImage" class="size-full object-cover transition-transform duration-[3000ms] group-hover:scale-105" />
-        <div v-else class="size-full bg-gradient-to-br from-gray-200 to-gray-300" />
+        <div v-else class="size-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-zinc-800 dark:to-zinc-900" />
         <div class="absolute inset-0 bg-black/10 transition-opacity duration-700 group-hover:bg-black/5" />
         
         <div class="absolute top-16 right-20 text-right text-white select-none">
@@ -95,7 +114,7 @@ const activeCategoryItems = computed(() => {
           <div 
             v-for="cat in categoriesWithItems.slice(0, 3)" 
             :key="cat.id"
-            class="relative h-64 rounded-3xl overflow-hidden cursor-pointer group shadow-[0_12px_32px_-8px_rgba(0,0,0,0.1)] transition-all duration-500 hover:shadow-[0_20px_48px_-12px_rgba(0,0,0,0.2)] hover:-translate-y-1"
+            class="relative h-64 rounded-3xl overflow-hidden cursor-pointer group shadow-[0_12px_32px_-8px_rgba(0,0,0,0.1)] transition-all duration-500 hover:shadow-[0_20px_48px_-12px_rgba(0,0,0,0.2)] hover:-translate-y-1 border border-transparent dark:border-white/10"
             @click="scrollToCategory(cat.id)"
           >
             <img v-if="cat.imageUrl" :src="cat.imageUrl" class="size-full object-cover transition-transform duration-1000 group-hover:scale-110 blur-[0.5px] group-hover:blur-0" />
@@ -117,7 +136,7 @@ const activeCategoryItems = computed(() => {
           class="px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 active:scale-95"
           :class="activeCategory === cat.id 
             ? 'text-white shadow-2xl' 
-            : 'bg-white text-gray-400 hover:text-gray-900 border border-gray-200/50 hover:border-gray-300'"
+            : 'bg-white dark:bg-zinc-900 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white border border-gray-200/50 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/20'"
           :style="activeCategory === cat.id ? { 
             backgroundColor: project.primaryColor || '#4a3423',
             boxShadow: `0 25px 50px -12px ${(project.primaryColor || '#4a3423')}4D`
@@ -132,12 +151,12 @@ const activeCategoryItems = computed(() => {
       <section v-if="activeCategory" class="space-y-10 animate-fade-in pt-4">
         <div class="space-y-3 ml-2">
           <h2 
-            class="text-[52px] font-black italic uppercase tracking-[-0.06em] leading-none"
-            :style="{ color: project.primaryColor || '#2d241c' }"
+            class="text-[52px] font-black italic uppercase tracking-[-0.06em] leading-none text-gray-900 dark:text-white"
+            :style="{ color: isDark ? 'white' : (project.primaryColor || '#2d241c') }"
           >
             {{ categories.find(c => c.id === activeCategory)?.name }}
           </h2>
-          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.4em] pl-1">
+          <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-[0.4em] pl-1">
             Browse our selection of artisan {{ categories.find(c => c.id === activeCategory)?.name.toLowerCase() }}
           </p>
         </div>
@@ -145,7 +164,7 @@ const activeCategoryItems = computed(() => {
         <!-- Sub-filters -->
         <div class="flex gap-4 ml-1">
           <button 
-            class="px-8 py-4 text-white rounded-xl text-[9px] font-black uppercase tracking-[0.3em] shadow-xl hover:brightness-110 transition-all"
+            class="px-8 py-4 text-white rounded-xl text-[9px] font-black uppercase tracking-[0.3em] shadow-xl hover:brightness-110 transition-all font-sans"
             :style="{ 
               backgroundColor: project.primaryColor || '#4a3423',
               boxShadow: `0 20px 25px -5px ${(project.primaryColor || '#4a3423')}1A`
@@ -153,7 +172,7 @@ const activeCategoryItems = computed(() => {
           >
             All Items
           </button>
-          <button class="px-8 py-4 bg-white text-gray-400 font-black rounded-xl text-[9px] uppercase tracking-[0.3em] border border-gray-200 transition-all hover:border-gray-400 hover:text-gray-900">Recommended</button>
+          <button class="px-8 py-4 bg-white dark:bg-zinc-900 text-gray-400 dark:text-gray-500 font-black rounded-xl text-[9px] uppercase tracking-[0.3em] border border-gray-200 dark:border-white/5 transition-all hover:border-gray-400 dark:hover:border-white/20 hover:text-gray-900 dark:hover:text-white">Recommended</button>
         </div>
 
         <!-- Items List -->
@@ -161,43 +180,43 @@ const activeCategoryItems = computed(() => {
           <div 
             v-for="item in activeCategoryItems" 
             :key="item.id"
-            class="bg-white rounded-2xl p-7 flex items-center gap-10 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] border border-white/60 hover:shadow-[0_16px_48px_-12px_rgba(0,0,0,0.12)] transition-all duration-500 group cursor-pointer active:scale-[0.99]"
+            class="bg-white dark:bg-zinc-900/40 rounded-3xl p-7 flex flex-col sm:flex-row items-center gap-10 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] border border-white/60 dark:border-white/5 hover:shadow-[0_16px_48px_-12px_rgba(0,0,0,0.12)] transition-all duration-500 group cursor-pointer active:scale-[0.99]"
             @click="emit('openItemDetail', item)"
           >
             <!-- Circular image (now with subtle radius) -->
-            <div class="size-28 rounded-2xl bg-gray-50 flex items-center justify-center border-2 border-[#f1f0ee] shadow-inner overflow-hidden shrink-0 group-hover:scale-105 transition-all duration-500">
+            <div class="size-32 rounded-2xl bg-gray-50 dark:bg-zinc-800 flex items-center justify-center border-2 border-[#f1f0ee] dark:border-white/5 shadow-inner overflow-hidden shrink-0 group-hover:scale-105 transition-all duration-500">
                <img v-if="item.images?.length" :src="item.images[0]" class="size-full object-cover transition-transform duration-700 group-hover:rotate-2" />
-               <UIcon v-else name="i-heroicons-cake" class="size-14 text-gray-100 transition-colors group-hover:text-gray-200" />
+               <UIcon v-else name="i-heroicons-cake" class="size-14 text-gray-100 dark:text-zinc-700 transition-colors group-hover:text-gray-200" />
             </div>
             
-            <div class="flex-1 min-w-0 space-y-3">
+            <div class="flex-1 min-w-0 space-y-3 text-center sm:text-left">
                <div>
                   <h4 
-                    class="text-2xl font-black italic uppercase tracking-tight transition-colors line-clamp-1 leading-none group-hover:text-[var(--hover-color)]"
-                    :style="{ '--hover-color': project.primaryColor || '#4a3423', color: '#2d241c' }"
+                    class="text-2xl font-black italic uppercase tracking-tight transition-colors line-clamp-1 leading-none group-hover:text-[var(--hover-color)] text-gray-900 dark:text-white"
+                    :style="{ '--hover-color': project.primaryColor || '#4a3423' }"
                   >
                     {{ item.name }}
                   </h4>
-                  <p class="text-sm text-gray-400 font-medium leading-relaxed max-w-2xl line-clamp-2 mt-2 opacity-80">{{ item.description }}</p>
+                  <p class="text-sm text-gray-400 dark:text-gray-500 font-medium leading-relaxed max-w-2xl line-clamp-2 mt-2 opacity-80">{{ item.description }}</p>
                </div>
-               <div class="flex items-center gap-5 pt-1">
+               <div class="flex items-center justify-center sm:justify-start gap-5 pt-1">
                   <span 
                     class="text-xl font-black tabular-nums tracking-[-0.04em]"
-                    :style="{ color: project.primaryColor || '#4a3423' }"
+                    :style="{ color: isDark ? 'white' : (project.primaryColor || '#4a3423') }"
                   >
                     {{ props.project.currency }} {{ item.price }}
                   </span>
-                  <div class="h-1 w-1 rounded-full bg-gray-300"></div>
-                  <span v-if="item.isAvailable" class="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600/70">In Stock</span>
+                  <div class="h-1 w-1 rounded-full bg-gray-300 dark:bg-zinc-700"></div>
+                  <span v-if="item.isAvailable" class="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500/70">In Stock</span>
                   <span v-else class="text-[9px] font-black uppercase tracking-[0.2em] text-red-400/70">Unavailable</span>
                </div>
             </div>
 
-            <div class="pr-4 shrink-0">
+            <div class="pr-0 sm:pr-4 shrink-0 w-full sm:w-auto">
                <UButton 
                  label="View Detail" 
                  variant="solid" 
-                 class="text-white rounded-xl px-12 py-4 font-black uppercase text-[10px] tracking-[0.3em] active:scale-95 transition-all font-sans"
+                 class="text-white rounded-xl px-12 py-4 font-black uppercase text-[10px] tracking-[0.3em] active:scale-95 transition-all font-sans w-full sm:w-auto"
                  :style="{ 
                    backgroundColor: project.primaryColor || '#4a3423',
                    boxShadow: `0 12px 24px -8px ${(project.primaryColor || '#4a3423')}4D`
@@ -209,20 +228,6 @@ const activeCategoryItems = computed(() => {
         </div>
       </section>
     </main>
-
-    <!-- Floating UI Button -->
-    <div class="fixed bottom-12 right-12 z-[60]">
-       <div 
-          class="size-20 rounded-2xl flex items-center justify-center text-white shadow-2xl cursor-pointer hover:scale-110 active:scale-90 transition-all group overflow-hidden border border-white/5"
-          :style="{ 
-            backgroundColor: project.primaryColor || '#4a3423',
-            boxShadow: `0 24px 48px -12px ${(project.primaryColor || '#4a3423')}80`
-          }"
-        >
-          <div class="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
-          <UIcon name="i-heroicons-credit-card" class="size-9 relative z-10 drop-shadow-lg" />
-       </div>
-    </div>
   </div>
 </template>
 

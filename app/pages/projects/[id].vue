@@ -492,6 +492,8 @@ const goToCategories = () => {
       :item="selectedItem"
       @success="refreshProject"
     />
+
+    />
   </div>
 </template>
 
