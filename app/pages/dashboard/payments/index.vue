@@ -78,9 +78,9 @@ const getProjectTitle = (projectId: number) => {
           <div class="w-full sm:w-64">
              <USelectMenu
                 v-model="selectedProjectId"
-                :options="projectOptions"
-                value-attribute="value"
-                option-attribute="label"
+                :items="projectOptions"
+                value-key="value"
+                label-key="label"
                 placeholder="Filter by Project"
                 size="xl"
                 class="w-full"
