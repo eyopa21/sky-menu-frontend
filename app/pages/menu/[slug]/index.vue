@@ -44,7 +44,7 @@ const menuItemsByCategory = computed(() => {
   if (!project.value?.menu?.menuItems) return {}
   
   const grouped: Record<number, MenuItem[]> = {}
-  project.value.menu.menuItems.forEach(item => {
+  project.value?.menu?.menuItems?.forEach(item => {
     if (!grouped[item.categoryId]) {
       grouped[item.categoryId] = []
     }
@@ -91,15 +91,33 @@ useHead({
       :item="selectedItem"
     />
 
-    <!-- Floating Feedback Button -->
-    <div class="fixed bottom-8 right-8 z-40 animate-bounce-subtle">
-       <UButton 
-          icon="i-heroicons-chat-bubble-bottom-center-text" 
-          size="xl" 
-          class="rounded-full size-16 shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border-4 border-white dark:border-[var(--color-app-bg)]"
-          :style="{ backgroundColor: project.primaryColor || '#10b981', color: 'white' }"
-          @click="navigateTo(`/menu/${slug}/feedback`)"
-       />
+    <!-- Floating Action Buttons -->
+    <div class="fixed bottom-8 right-8 z-40 flex flex-col gap-4">
+       <!-- Payment Button -->
+       <div class="animate-bounce-subtle">
+          <UTooltip text="View Payment Methods" :popper="{ placement: 'left' }">
+             <UButton 
+                icon="i-heroicons-credit-card" 
+                size="xl" 
+                class="rounded-full size-16 shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border-4 border-white dark:border-[var(--color-app-bg)]"
+                :style="{ backgroundColor: project.primaryColor || '#10b981', color: 'white' }"
+                @click="navigateTo(`/menu/${slug}/payment`)"
+             />
+          </UTooltip>
+       </div>
+
+       <!-- Feedback Button -->
+       <div class="animate-bounce-subtle" style="animation-delay: 0.5s">
+          <UTooltip text="Share Feedback" :popper="{ placement: 'left' }">
+             <UButton 
+                icon="i-heroicons-chat-bubble-bottom-center-text" 
+                size="xl" 
+                class="rounded-full size-16 shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border-4 border-white dark:border-[var(--color-app-bg)]"
+                :style="{ backgroundColor: project.primaryColor || '#10b981', color: 'white' }"
+                @click="navigateTo(`/menu/${slug}/feedback`)"
+             />
+          </UTooltip>
+       </div>
     </div>
   </div>
 </template>

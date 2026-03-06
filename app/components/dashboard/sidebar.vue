@@ -39,7 +39,7 @@ const items = ref([
       {
         label: 'Payment Methods',
         icon: 'i-heroicons-currency-dollar',
-        
+        to: '/dashboard/payments',
       },
     ],
   },
