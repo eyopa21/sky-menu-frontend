@@ -3,10 +3,9 @@ import QrcodeVue from 'qrcode.vue'
 import { projectsRepository } from '~/repositories/projects'
 import { categoriesRepository } from '~/repositories/categories'
 import { menusRepository } from '~/repositories/menus'
-import { menuItemsRepository } from '~/repositories/menu-items'
-import { UpdateProjectValidationSchema, type TUpdateProjectValidationSchema } from '~/zod/projects/UpdateProjectValidation'
 import CategoryModal from '~/components/dashboard/categories/categoryModal.vue'
 import MenuItemModal from '~/components/dashboard/menu-items/menuItemModal.vue'
+import ProjectModal from '~/components/dashboard/projects/ProjectModal.vue'
 
 definePageMeta({
   layout: 'dashboard',
@@ -18,13 +17,12 @@ const { $api } = useNuxtApp()
 const projectsRepo = projectsRepository($api)
 const categoriesRepo = categoriesRepository($api)
 const menusRepo = menusRepository($api)
-const menuItemsRepo = menuItemsRepository($api)
 const toast = useToast()
 
 const id = computed(() => Number(route.params.id))
 const loading = ref(false)
-const isEditing = ref(false)
 
+const isProjectModalOpen = ref(false)
 const isCategoryModalOpen = ref(false)
 const selectedCategory = ref<any>(null)
 
@@ -40,36 +38,6 @@ const tabs = [
 
 const { data: project, refresh: refreshProject } = await useAsyncData(`project-${id.value}`, () => projectsRepo.getProjectById(id.value))
 const { data: categories, refresh: refreshCategories } = await useAsyncData(`categories-${id.value}`, () => categoriesRepo.getCategoriesByProjectId(id.value))
-
-const menu = computed(()   => project.value?.menu)
-
-const state = reactive({
-  title: project.value?.title || '',
-  description: project.value?.description || '',
-  currency: project.value?.currency || 'ETB',
-  address: project.value?.address || '',
-  phone: project.value?.phone || '',
-  website: project.value?.website || '',
-  isPublished: project.value?.isPublished || false,
-  primaryColor: project.value?.primaryColor || '#10b981',
-  accentColor: project.value?.accentColor || '#3b82f6',
-  menuUIType: project.value?.menuUIType || 'one',
-})
-
-watch(project, (newVal) => {
-  if (newVal) {
-    state.title = newVal.title
-    state.description = newVal.description
-    state.currency = newVal.currency
-    state.address = newVal.address || ''
-    state.phone = newVal.phone || ''
-    state.website = newVal.website || ''
-    state.isPublished = newVal.isPublished
-    state.primaryColor = newVal.primaryColor || '#10b981'
-    state.accentColor = newVal.accentColor || '#3b82f6'
-    state.menuUIType = newVal.menuUIType || 'one'
-  }
-}, { immediate: true })
 
 const publicMenuUrl = computed(() => {
   if (!project.value?.slug) return ''
@@ -99,31 +67,6 @@ const downloadQRCode = () => {
   toast.add({ title: 'QR Code downloaded!', color: 'success' })
 }
 
-async function onSubmit(event: { data: TUpdateProjectValidationSchema }) {
-  try {
-    loading.value = true
-    await projectsRepo.updateProject(id.value, event.data)
-    toast.add({ title: 'Project updated successfully!', color: 'success' })
-    isEditing.value = false
-    refreshProject()
-  } catch (err) {
-    console.error('Update project:', err)
-    toast.add({ title: 'Failed to update project.', color: 'error' })
-  } finally {
-    loading.value = false
-  }
-}
-
-const deleteProject = async () => {
-  try {
-    await projectsRepo.deleteProject(id.value)
-    toast.add({ title: 'Project deleted', color: 'success' })
-    router.push('/projects')
-  } catch (err) {
-    toast.add({ title: 'Failed to delete project', color: 'error' })
-  }
-}
-
 const openAddCategory = () => {
   selectedCategory.value = null
   isCategoryModalOpen.value = true
@@ -134,16 +77,6 @@ const openEditCategory = (category: any) => {
   isCategoryModalOpen.value = true
 }
 
-const deleteCategory = async (categoryId: number) => {
-  try {
-    await categoriesRepo.deleteCategory(categoryId)
-    toast.add({ title: 'Category deleted', color: 'success' })
-    refreshCategories()
-  } catch (err) {
-    toast.add({ title: 'Failed to delete category', color: 'error' })
-  }
-}
-
 const openAddItem = () => {
   selectedItem.value = null
   isItemModalOpen.value = true
@@ -152,16 +85,6 @@ const openAddItem = () => {
 const openEditItem = (item: any) => {
   selectedItem.value = item
   isItemModalOpen.value = true
-}
-
-const deleteItem = async (itemId: number) => {
-  try {
-    await menuItemsRepo.deleteMenuItem(itemId)
-    toast.add({ title: 'Item deleted', color: 'success' })
-    refreshProject() 
-  } catch (err) {
-    toast.add({ title: 'Failed to delete item', color: 'error' })
-  }
 }
 
 const createMenu = async () => {
@@ -183,7 +106,7 @@ const goToCategories = () => {
 </script>
 
 <template>
-  <div class="space-y-10 pb-20 w-full">
+  <div class="space-y-10 pb-20 w-full" v-if="project">
     <!-- Header Section (Premium) -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 px-4">
       <div class="flex items-center gap-8">
@@ -197,11 +120,11 @@ const goToCategories = () => {
         <div class="relative group">
           <div class="flex items-center gap-5">
              <h1 class="text-3xl md:text-5xl font-black text-white dark:text-white light:text-gray-900 tracking-tight leading-none group-hover:text-emerald-400 transition-colors">
-              {{ project?.title }}
+              {{ project.title }}
             </h1>
             <UBadge
-              :label="project?.isPublished ? 'Live' : 'Drafting'"
-              :color="project?.isPublished ? 'success' : 'warning'"
+              :label="project.isPublished ? 'Live' : 'Drafting'"
+              :color="project.isPublished ? 'success' : 'warning'"
               class="rounded-lg font-black tracking-tighter uppercase px-3 py-1.5 backdrop-blur-md"
             />
           </div>
@@ -210,7 +133,7 @@ const goToCategories = () => {
       </div>
       <div class="flex items-center gap-4">
         <UButton
-          v-if="project?.isPublished"
+          v-if="project.isPublished"
           :to="`/menu/${project.slug}`"
           target="_blank"
           icon="i-heroicons-eye"
@@ -219,20 +142,11 @@ const goToCategories = () => {
           class="rounded-xl font-black px-6 py-3.5 transition-all"
           label="Live Preview"
         />
-        <UPopconfirm title="Delete Project?" description="This will permanently remove this project and all its data." @confirm="deleteProject">
-          <UButton
-            icon="i-heroicons-trash"
-            color="error"
-            variant="soft"
-            class="rounded-xl font-bold p-3.5"
-          />
-        </UPopconfirm>
         <UButton
-          :label="isEditing ? 'Cancel Edit' : 'Settings'"
-          :icon="isEditing ? 'i-heroicons-x-mark' : 'i-heroicons-cog-6-tooth'"
-          :variant="isEditing ? 'ghost' : 'solid'"
+          label="Settings"
+          icon="i-heroicons-cog-6-tooth"
           class="rounded-xl font-black px-7 py-3.5 bg-white dark:bg-white light:bg-gray-900 dark:text-black light:text-white hover:bg-emerald-400 dark:hover:bg-emerald-400 light:hover:bg-emerald-600 transition-all shadow-xl shadow-black/20"
-          @click="isEditing = !isEditing"
+          @click="isProjectModalOpen = true"
         />
       </div>
     </div>
@@ -246,12 +160,12 @@ const goToCategories = () => {
           <div class="bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white rounded-[23px] overflow-hidden backdrop-blur-3xl">
             <!-- Cover Art -->
             <div class="relative h-64 w-full overflow-hidden shrink-0 group/cover border-b border-white/5">
-              <img v-if="project?.coverImage" :src="project.coverImage" class="h-full w-full object-cover transition-transform duration-[3000ms] group-hover/cover:scale-110 opacity-60" />
+              <img v-if="project.coverImage" :src="project.coverImage" class="h-full w-full object-cover transition-transform duration-[3000ms] group-hover/cover:scale-110 opacity-60" />
               <div class="absolute inset-0 bg-gradient-to-t from-[#0d0d0f] via-transparent to-transparent" />
               
               <div class="absolute -bottom-12 left-8 z-10 transition-transform duration-500 group-hover/cover:translate-y-[-4px]">
                 <div class="size-28 rounded-2xl bg-zinc-900 border-[8px] border-zinc-950 dark:border-zinc-950 light:border-white shadow-2xl overflow-hidden">
-                  <img v-if="project?.logo" :src="project.logo" class="size-full object-cover" />
+                  <img v-if="project.logo" :src="project.logo" class="size-full object-cover" />
                   <div v-else class="size-full flex items-center justify-center">
                     <UIcon name="i-heroicons-photo" class="size-10 text-gray-700/50" />
                   </div>
@@ -262,15 +176,15 @@ const goToCategories = () => {
             <!-- Ident info -->
             <div class="p-8 pt-16 space-y-6">
               <div>
-                <h2 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">{{ project?.title }}</h2>
-                <p class="text-[11px] font-black tracking-widest uppercase text-emerald-400 mt-1">/{{ project?.slug }}</p>
+                <h2 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">{{ project.title }}</h2>
+                <p class="text-[11px] font-black tracking-widest uppercase text-emerald-400 mt-1">/{{ project.slug }}</p>
               </div>
 
               <div class="space-y-4">
                  <div class="flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-50 border border-white/5 dark:border-white/5 light:border-gray-200">
                     <div>
                         <p class="text-[10px] font-black text-emerald-500/60 transition-colors group-hover:text-emerald-400 uppercase tracking-widest mb-1 leading-none">Currency</p>
-                        <p class="text-lg font-black text-white dark:text-white light:text-gray-900 leading-none">{{ project?.currency }}</p>
+                        <p class="text-lg font-black text-white dark:text-white light:text-gray-900 leading-none">{{ project.currency }}</p>
                     </div>
                     <UIcon name="i-heroicons-banknotes" class="size-8 text-emerald-500/20" />
                  </div>
@@ -278,7 +192,7 @@ const goToCategories = () => {
                  <div class="flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-50 border border-white/5 dark:border-white/5 light:border-gray-200">
                     <div>
                         <p class="text-[10px] font-black text-purple-500/60 uppercase tracking-widest mb-1 leading-none">Established</p>
-                        <p class="text-lg font-black text-white dark:text-white light:text-gray-900 leading-none">{{ project ? new Date(project.createdAt).toLocaleDateString() : '-' }}</p>
+                        <p class="text-lg font-black text-white dark:text-white light:text-gray-900 leading-none">{{ new Date(project.createdAt).toLocaleDateString() }}</p>
                     </div>
                     <UIcon name="i-heroicons-calendar" class="size-8 text-purple-500/20" />
                  </div>
@@ -338,14 +252,14 @@ const goToCategories = () => {
           </div>
         </div>
 
-        <!-- Quick Activity Stats (Refined) -->
+        <!-- Quick Activity Stats -->
         <div class="grid grid-cols-2 gap-4">
            <div class="group p-6 rounded-[28px] bg-white/[0.02] dark:bg-white/[0.02] light:bg-white border border-white/[0.05] dark:border-white/[0.05] light:border-gray-200 text-center transition-all hover:bg-emerald-500/5 hover:border-emerald-500/20 cursor-default">
               <div class="text-3xl font-black text-white dark:text-white light:text-gray-900 group-hover:text-emerald-400 transition-colors">{{ categories?.length || 0 }}</div>
               <div class="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Categories</div>
            </div>
            <div class="group p-6 rounded-[28px] bg-white/[0.02] dark:bg-white/[0.02] light:bg-white border border-white/[0.05] dark:border-white/[0.05] light:border-gray-200 text-center transition-all hover:bg-purple-500/5 hover:border-purple-500/20 cursor-default">
-              <div class="text-3xl font-black text-white dark:text-white light:text-gray-900 group-hover:text-purple-400 transition-colors">{{ project?.menu?.menuItems?.length || 0 }}</div>
+              <div class="text-3xl font-black text-white dark:text-white light:text-gray-900 group-hover:text-purple-400 transition-colors">{{ project.menu?.menuItems?.length || 0 }}</div>
               <div class="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Items</div>
            </div>
         </div>
@@ -364,31 +278,31 @@ const goToCategories = () => {
                                    <div class="space-y-2">
                                       <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Legal Brand Name</label>
                                       <div class="p-4 rounded-2xl bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-50 border border-white/5 dark:border-white/5 light:border-gray-200 text-lg font-bold text-white dark:text-white light:text-gray-900">
-                                         {{ project?.title }}
+                                         {{ project.title }}
                                       </div>
                                    </div>
                                    <div class="space-y-2">
                                       <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Project Root Slug</label>
                                       <div class="p-4 rounded-2xl bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-50 border border-white/5 dark:border-white/5 light:border-gray-200 text-lg font-mono font-black text-emerald-400">
-                                         /{{ project?.slug }}
+                                         /{{ project.slug }}
                                       </div>
                                    </div>
                                    <div class="md:col-span-2 space-y-2">
                                       <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Brand Description</label>
                                       <div class="p-5 rounded-2xl bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-50 border border-white/5 dark:border-white/5 light:border-gray-200 text-gray-300 dark:text-gray-300 light:text-gray-700 leading-relaxed font-medium">
-                                         {{ project?.description || 'No description provided.' }}
+                                         {{ project.description || 'No description provided.' }}
                                       </div>
                                    </div>
                                    <div class="space-y-2">
                                       <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Public Contact</label>
                                       <div class="p-4 rounded-2xl bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-50 border border-white/5 dark:border-white/5 light:border-gray-200 text-white dark:text-white light:text-gray-900 font-bold">
-                                         {{ project?.phone || 'Private line' }}
+                                         {{ project.phone || 'Private line' }}
                                       </div>
                                    </div>
                                    <div class="space-y-2">
                                       <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Digital Presence</label>
                                       <div class="p-4 rounded-2xl bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-50 border border-white/5 dark:border-white/5 light:border-gray-200 text-white dark:text-white light:text-gray-900 font-bold truncate">
-                                         {{ project?.website || 'sky-menu.app' }}
+                                         {{ project.website || 'sky-menu.app' }}
                                       </div>
                                    </div>
                                 </div>
@@ -398,11 +312,11 @@ const goToCategories = () => {
                                       <h3 class="text-xs font-black text-white dark:text-white light:text-gray-900 uppercase tracking-widest pr-4 border-r border-emerald-500/20 inline-block">Design Identity</h3>
                                       <div class="flex items-center gap-10">
                                          <div class="relative group/color transition-transform active:scale-95">
-                                            <div class="size-14 rounded-2xl border-4 border-white/10 dark:border-white/10 light:border-gray-200 shadow-2xl transition-all group-hover/color:rotate-6" :style="{ backgroundColor: project?.primaryColor || '#10b981' }" />
+                                            <div class="size-14 rounded-2xl border-4 border-white/10 dark:border-white/10 light:border-gray-200 shadow-2xl transition-all group-hover/color:rotate-6" :style="{ backgroundColor: project.primaryColor || '#10b981' }" />
                                             <p class="text-[10px] font-black text-gray-500 mt-2 text-center uppercase">Primary</p>
                                          </div>
                                          <div class="relative group/color transition-transform active:scale-95">
-                                            <div class="size-14 rounded-2xl border-4 border-white/10 dark:border-white/10 light:border-gray-200 shadow-2xl transition-all group-hover/color:-rotate-6" :style="{ backgroundColor: project?.accentColor || '#3b82f6' }" />
+                                            <div class="size-14 rounded-2xl border-4 border-white/10 dark:border-white/10 light:border-gray-200 shadow-2xl transition-all group-hover/color:-rotate-6" :style="{ backgroundColor: project.accentColor || '#3b82f6' }" />
                                             <p class="text-[10px] font-black text-gray-500 mt-2 text-center uppercase">Accent</p>
                                          </div>
                                       </div>
@@ -411,7 +325,7 @@ const goToCategories = () => {
                                        <h3 class="text-xs font-black text-white dark:text-white light:text-gray-900 uppercase tracking-widest pr-4 border-r border-emerald-500/20 inline-block">Location Matrix</h3>
                                        <div class="p-4 rounded-2xl bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-50 border border-white/5 dark:border-white/5 light:border-gray-200 flex items-center gap-3">
                                           <UIcon name="i-heroicons-map-pin" class="size-5 text-emerald-500" />
-                                          <span class="text-sm font-bold text-white dark:text-white light:text-gray-900 truncate">{{ project?.address || 'Global Digital Menu' }}</span>
+                                          <span class="text-sm font-bold text-white dark:text-white light:text-gray-900 truncate">{{ project.address || 'Global Digital Menu' }}</span>
                                        </div>
                                    </div>
                                 </div>
@@ -425,8 +339,8 @@ const goToCategories = () => {
                     <div class="mt-8 space-y-6 animate-fade-in">
                        <div class="flex items-center justify-between px-2">
                            <div>
-                               <h3 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Menu Architecture</h3>
-                               <p class="text-sm text-gray-500 font-medium">Categorize your offerings for effortless browsing.</p>
+                               <h3 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Menu Categories</h3>
+                               <p class="text-sm text-gray-500 font-medium">Categorize your menus for effortless browsing.</p>
                            </div>
                            <UButton icon="i-heroicons-plus-circle" label="New Category" color="success" class="rounded-xl font-black px-6 active:scale-95 transition-all shadow-lg shadow-emerald-500/10" @click="openAddCategory" />
                        </div>
@@ -447,9 +361,6 @@ const goToCategories = () => {
                                    <p class="text-[11px] text-gray-500 line-clamp-2 mt-1 font-medium">{{ category.description }}</p>
                                    <div class="flex items-center gap-1 mt-3 transition-transform">
                                       <UButton icon="i-heroicons-pencil-square" variant="soft" color="neutral" size="xs" class="rounded-lg" @click="openEditCategory(category)" />
-                                      <UPopconfirm title="Delete Category?" @confirm="deleteCategory(category.id)">
-                                         <UButton icon="i-heroicons-trash" variant="soft" color="error" size="xs" class="rounded-lg" />
-                                      </UPopconfirm>
                                    </div>
                                 </div>
                              </div>
@@ -460,7 +371,7 @@ const goToCategories = () => {
                            <div class="size-20 rounded-3xl bg-emerald-500/5 flex items-center justify-center mb-6">
                               <UIcon name="i-heroicons-squares-plus" class="size-10 text-emerald-500/40" />
                            </div>
-                           <h4 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Empty Architecture</h4>
+                           <h4 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Empty Categories</h4>
                            <p class="text-gray-500 font-medium max-w-sm mt-3 leading-relaxed">Let's build your menu structure. Create categories to start organizing your culinary items.</p>
                            <UButton icon="i-heroicons-plus" label="Build First Category" color="success" class="mt-10 rounded-xl font-black px-10 active:scale-95 transition-all" @click="openAddCategory" />
                        </div>
@@ -469,10 +380,10 @@ const goToCategories = () => {
 
                 <template #items>
                     <div class="mt-8 space-y-6 animate-fade-in">
-                        <div v-if="project?.menu">
+                        <div v-if="project.menu">
                            <div class="flex items-center justify-between px-2 mb-6">
                                <div>
-                                   <h3 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Gastronomy List</h3>
+                                   <h3 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Menu Items List</h3>
                                    <p class="text-sm text-gray-500 font-medium">Add, update and manage your delicious items.</p>
                                </div>
                                <UButton
@@ -508,9 +419,6 @@ const goToCategories = () => {
                                        
                                        <div class="flex items-center gap-2 mt-4 pt-4 border-t border-white/5">
                                           <UButton icon="i-heroicons-pencil-square" variant="soft" color="neutral" size="xs" class="rounded-lg px-3" label="Edit" @click="openEditItem(item)" />
-                                          <UPopconfirm title="Remove Item?" @confirm="deleteItem(item.id)">
-                                             <UButton icon="i-heroicons-trash" variant="soft" color="error" size="xs" class="rounded-lg px-3" label="Delete" />
-                                          </UPopconfirm>
                                        </div>
                                     </div>
                                  </div>
@@ -521,10 +429,10 @@ const goToCategories = () => {
                                <div class="size-20 rounded-3xl bg-purple-500/5 flex items-center justify-center mb-6">
                                   <UIcon name="i-heroicons-cake" class="size-10 text-purple-500/40" />
                                </div>
-                               <h4 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Gastronomically Empty</h4>
+                               <h4 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Menu Empty</h4>
                                <p class="text-gray-500 font-medium max-w-sm mt-3 leading-relaxed">
                                   {{ categories?.length ? 'Your categories are ready. Add your first signature dish to the menu.' : 'Build category architecture before populating your menu items.' }}
-                               </p>
+                                </p>
                                <UButton
                                  v-if="categories?.length"
                                  icon="i-heroicons-plus"
@@ -550,7 +458,7 @@ const goToCategories = () => {
                            </div>
                            <h4 class="text-2xl font-black text-white dark:text-white light:text-gray-900 tracking-tight">Main Menu Required</h4>
                            <p class="text-gray-500 font-medium max-w-sm mt-3 leading-relaxed">This project is not yet initialized. We need to create the main menu core before adding items.</p>
-                           <UButton label="Initialize Gastronomy" color="success" class="mt-10 rounded-xl font-black px-10 :loading=loading active:scale-95 transition-all shadow-lg shadow-emerald-500/10" @click="createMenu" />
+                           <UButton label="Initialize your Menu" color="success" class="mt-10 rounded-xl font-black px-10 :loading=loading active:scale-95 transition-all shadow-lg shadow-emerald-500/10" @click="createMenu" />
                         </div>
                     </div>
                 </template>
@@ -559,140 +467,14 @@ const goToCategories = () => {
       </div>
     </div>
 
-    <!-- Redesigned Settings Slideover -->
-    <USlideover 
-      v-model:open="isEditing" 
-      :ui="{ 
-        content: 'bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white border-white/10 dark:border-white/10 light:border-gray-200' 
-      }"
-    >
-      <template #header>
-        <div class="flex items-center justify-between w-full h-full px-4">
-          <div class="flex items-center gap-3">
-             <div class="size-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                <UIcon name="i-heroicons-cog-6-tooth" class="size-5 text-emerald-500" />
-             </div>
-             <h3 class="text-xl font-black text-white dark:text-white light:text-gray-900 uppercase tracking-tighter">Project Config</h3>
-          </div>
-          <UButton
-            color="neutral"
-            variant="ghost"
-            icon="i-heroicons-x-mark"
-            size="lg"
-            class="rounded-xl"
-            @click="isEditing = false"
-          />
-        </div>
-      </template>
+    <!-- Specialized Project Modal -->
+    <ProjectModal
+      v-model:open="isProjectModalOpen"
+      :project="project"
+      @success="refreshProject"
+    />
 
-      <template #body>
-        <UForm
-          id="project-settings-form"
-          :schema="UpdateProjectValidationSchema"
-          :state="state"
-          class="space-y-10 px-4 pb-20"
-          @submit="onSubmit"
-        >
-          <div class="space-y-8">
-            <UFormField label="Legal Name" name="title" required>
-              <UInput v-model="state.title" size="xl" class="w-full" :ui="{ base: 'rounded-2xl border-white/10 dark:border-white/10 light:border-gray-200 bg-white/5 focus:ring-emerald-500' }" />
-            </UFormField>
-
-            <UFormField label="Brand Story" name="description" required>
-              <UTextarea v-model="state.description" :rows="4" size="xl" class="w-full" :ui="{ base: 'rounded-2xl border-white/10 dark:border-white/10 light:border-gray-200 bg-white/5 focus:ring-emerald-500' }" />
-            </UFormField>
-
-            <div class="grid grid-cols-2 gap-6">
-              <UFormField label="Currency" name="currency">
-                <UInput v-model="state.currency" placeholder="USD, ETB..." size="xl" class="w-full" :ui="{ base: 'rounded-2xl border-white/10 dark:border-white/10 light:border-gray-200 bg-white/5' }" />
-              </UFormField>
-
-              <UFormField label="Contact" name="phone">
-                <UInput v-model="state.phone" size="xl" class="w-full" :ui="{ base: 'rounded-2xl border-white/10 dark:border-white/10 light:border-gray-200 bg-white/5' }" />
-              </UFormField>
-            </div>
-
-            <UFormField label="Official Website" name="website">
-              <UInput v-model="state.website" placeholder="https://..." size="xl" class="w-full" :ui="{ base: 'rounded-2xl border-white/10 dark:border-white/10 light:border-gray-200 bg-white/5' }" />
-            </UFormField>
-
-            <UFormField label="Physical Presence" name="address">
-              <UInput v-model="state.address" size="xl" class="w-full" :ui="{ base: 'rounded-2xl border-white/10 dark:border-white/10 light:border-gray-200 bg-white/5' }" />
-            </UFormField>
-
-            <!-- Color Palette -->
-            <div class="p-6 rounded-3xl bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-50 border border-white/5 dark:border-white/5 light:border-gray-200 space-y-6">
-                <div class="flex items-center gap-2 mb-2">
-                   <UIcon name="i-heroicons-paint-brush" class="size-4 text-emerald-500" />
-                   <h4 class="text-xs font-black uppercase tracking-widest text-white dark:text-white light:text-gray-900">Brand Identity</h4>
-                </div>
-                <div class="grid grid-cols-2 gap-8">
-                    <UFormField label="Primary" name="primaryColor">
-                        <div class="flex items-center gap-3">
-                        <UInput v-model="state.primaryColor" type="color" class="size-12 p-1.5 bg-transparent border-none" />
-                        <UInput v-model="state.primaryColor" size="sm" class="flex-1 font-mono text-[10px]" :ui="{ base: 'rounded-xl border-white/10 dark:border-white/10 light:border-gray-200 bg-white/5 font-black uppercase' }" />
-                        </div>
-                    </UFormField>
-
-                    <UFormField label="Accent" name="accentColor">
-                        <div class="flex items-center gap-3">
-                        <UInput v-model="state.accentColor" type="color" class="size-12 p-1.5 bg-transparent border-none" />
-                        <UInput v-model="state.accentColor" size="sm" class="flex-1 font-mono text-[10px]" :ui="{ base: 'rounded-xl border-white/10 dark:border-white/10 light:border-gray-200 bg-white/5 font-black uppercase' }" />
-                        </div>
-                    </UFormField>
-                </div>
-            </div>
-
-            <!-- Menu UI Type -->
-            <div class="space-y-4">
-              <div class="flex items-center gap-2 px-1">
-                <UIcon name="i-heroicons-computer-desktop" class="size-4 text-emerald-500" />
-                <h4 class="text-xs font-black uppercase tracking-widest text-white dark:text-white light:text-gray-900">Menu UI Style</h4>
-              </div>
-              <div class="grid grid-cols-3 gap-3">
-                <div 
-                  v-for="type in ['one', 'two', 'three']" 
-                  :key="type"
-                  class="relative cursor-pointer transition-all active:scale-95"
-                  @click="state.menuUIType = type as 'one' | 'two' | 'three'"
-                >
-                  <div 
-                    class="p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-3 bg-white/[0.03] dark:bg-white/[0.03] light:bg-gray-50"
-                    :class="state.menuUIType === type ? 'border-emerald-500 shadow-lg shadow-emerald-500/10' : 'border-white/5 dark:border-white/5 light:border-gray-200'"
-                  >
-                    <div class="size-10 rounded-xl flex items-center justify-center bg-white/[0.05]" :class="state.menuUIType === type ? 'text-emerald-500' : 'text-gray-500'">
-                       <span class="text-lg font-black uppercase">{{ type }}</span>
-                    </div>
-                    <p class="text-[10px] font-black uppercase tracking-widest" :class="state.menuUIType === type ? 'text-emerald-400' : 'text-gray-500'">Style {{ type }}</p>
-                  </div>
-                  <div v-if="state.menuUIType === type" class="absolute -top-1 -right-1 size-5 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-[#0d0d0f]">
-                    <UIcon name="i-heroicons-check" class="size-3 text-black font-black" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Public switch -->
-            <div class="flex items-center justify-between p-6 bg-emerald-500/5 rounded-3xl border border-emerald-500/10">
-              <div class="space-y-1">
-                <h4 class="text-sm font-black text-white dark:text-white light:text-gray-900 uppercase tracking-widest leading-none">Global Launch</h4>
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Toggle visibility to the world</p>
-              </div>
-              <USwitch v-model="state.isPublished" color="success" size="lg" />
-            </div>
-          </div>
-        </UForm>
-      </template>
-
-      <template #footer>
-        <div class="flex justify-end gap-3 w-full p-4">
-          <UButton variant="ghost" label="Dismiss" class="rounded-xl font-bold" @click="isEditing = false" />
-          <UButton type="submit" form="project-settings-form" label="Commit Changes" :loading="loading" color="emerald" class="rounded-xl font-black px-8 py-3 shadow-lg shadow-emerald-500/10 active:scale-95 transition-all" />
-        </div>
-      </template>
-    </USlideover>
-
-    <!-- Modals (Unchanged logic, just UI check) -->
+    <!-- Specialized Category Modal -->
     <CategoryModal
       v-if="isCategoryModalOpen"
       v-model:open="isCategoryModalOpen"
@@ -701,8 +483,9 @@ const goToCategories = () => {
       @success="refreshCategories"
     />
 
+    <!-- Specialized Menu Item Modal -->
     <MenuItemModal
-      v-if="isItemModalOpen && project?.menu"
+      v-if="isItemModalOpen && project.menu"
       v-model:open="isItemModalOpen"
       :menu-id="project.menu.id"
       :categories="categories || []"

@@ -17,6 +17,7 @@ const { uploadFile } = useFileUploader()
 
 const isOpen = defineModel<boolean>('open', { default: false })
 const loading = ref(false)
+const isDeleteCategoryModalOpen = ref(false)
 
 const state = reactive({
   name: props.category?.name || '',
@@ -67,6 +68,26 @@ async function onSubmit(event: { data: TCategoryValidationSchema }) {
     loading.value = false
   }
 }
+
+const confirmDeleteCategory = () => {
+  isDeleteCategoryModalOpen.value = true
+}
+
+const deleteCategory = async () => {
+  if (!props.category?.id) return
+  try {
+    loading.value = true
+    await categoriesRepo.deleteCategory(props.category.id)
+    toast.add({ title: 'Category deleted', color: 'success' })
+    isDeleteCategoryModalOpen.value = false
+    isOpen.value = false
+    emit('success')
+  } catch (err) {
+    toast.add({ title: 'Failed to delete category', color: 'error' })
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>
@@ -74,12 +95,23 @@ async function onSubmit(event: { data: TCategoryValidationSchema }) {
     <template #header>
       <div class="flex items-center justify-between w-full h-full">
         <h3 class="text-xl font-bold text-white">{{ category ? 'Edit Category' : 'Add New Category' }}</h3>
-        <UButton
-          color="neutral"
-          variant="ghost"
-          icon="i-heroicons-x-mark"
-          @click="isOpen = false"
-        />
+        <div class="flex items-center gap-2">
+          <UButton 
+            v-if="category"
+            icon="i-heroicons-trash" 
+            variant="soft" 
+            color="error" 
+            size="xs" 
+            class="rounded-lg" 
+            @click="confirmDeleteCategory"
+          />
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-heroicons-x-mark"
+            @click="isOpen = false"
+          />
+        </div>
       </div>
     </template>
 
@@ -135,4 +167,12 @@ async function onSubmit(event: { data: TCategoryValidationSchema }) {
       </div>
     </template>
   </USlideover>
+   <AppConfirmModal
+      v-model:open="isDeleteCategoryModalOpen"
+      title="Delete Category?"
+      description="This will also delete all menus and items under this category. This action is irreversible."
+      confirm-button-text="Delete Category"
+      :loading="loading"
+      @confirm="deleteCategory"
+    />
 </template>

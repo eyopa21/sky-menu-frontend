@@ -64,12 +64,28 @@ async function onSubmit(event: { data: TCreateProjectValidationSchema }) {
   <div class="inline-block">
     <UButton label="New Project" icon="i-heroicons-plus" @click="isOpen = true" />
 
-    <UModal v-model:open="isOpen" title="New Project" description="Create a new digital menu project.">
-      <template #content>
+    <USlideover v-model:open="isOpen">
+      <template #header>
+        <div class="flex items-center justify-between w-full h-full">
+          <div>
+            <h3 class="text-xl font-bold text-white">New Project</h3>
+            <p class="text-xs text-zinc-400">Create a new digital menu project.</p>
+          </div>
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-heroicons-x-mark"
+            @click="isOpen = false"
+          />
+        </div>
+      </template>
+
+      <template #body>
         <UForm
+          id="new-project-form"
           :schema="CreateProjectValidationSchema"
           :state="state"
-          class="space-y-6 p-6"
+          class="space-y-6"
           @submit="onSubmit"
         >
           <UFormField label="Title" name="title" required>
@@ -97,13 +113,21 @@ async function onSubmit(event: { data: TCreateProjectValidationSchema }) {
           <UFormField label="Cover Image" name="coverImage">
             <AppFileUploader v-model="state.coverImage" name="coverImage" accept="image/*" />
           </UFormField>
-
-          <div class="flex justify-end gap-3 pt-4">
-            <UButton variant="ghost" label="Cancel" @click="isOpen = false" />
-            <UButton type="submit" label="Create Project" :loading="loading" color="success" />
-          </div>
         </UForm>
       </template>
-    </UModal>
+
+      <template #footer>
+        <div class="flex justify-end gap-3 w-full">
+          <UButton variant="ghost" label="Cancel" @click="isOpen = false" />
+          <UButton 
+            type="submit" 
+            form="new-project-form"
+            label="Create Project" 
+            :loading="loading" 
+            color="success" 
+          />
+        </div>
+      </template>
+    </USlideover>
   </div>
 </template>

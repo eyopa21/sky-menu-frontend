@@ -19,6 +19,7 @@ const { uploadFile } = useFileUploader()
 
 const isOpen = defineModel<boolean>('open', { default: false })
 const loading = ref(false)
+const isDeleteItemModalOpen = ref(false)
 
 const state = reactive({
   name: props.item?.name || '',
@@ -93,6 +94,26 @@ async function onSubmit(event: { data: TMenuItemValidationSchema }) {
 const removeImage = (index: number) => {
   currentImages.value.splice(index, 1)
 }
+
+const confirmDeleteItem = () => {
+  isDeleteItemModalOpen.value = true
+}
+
+const deleteItem = async () => {
+  if (!props.item?.id) return
+  try {
+    loading.value = true
+    await menuItemsRepo.deleteMenuItem(props.item.id)
+    toast.add({ title: 'Item deleted successfully!', color: 'success' })
+    isDeleteItemModalOpen.value = false
+    isOpen.value = false
+    emit('success')
+  } catch (err) {
+    toast.add({ title: 'Failed to delete item.', color: 'error' })
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>
@@ -100,12 +121,24 @@ const removeImage = (index: number) => {
     <template #header>
       <div class="flex items-center justify-between w-full h-full">
         <h3 class="text-xl font-bold text-white">{{ item ? 'Edit Menu Item' : 'Add Menu Item' }}</h3>
-        <UButton
-          color="neutral"
-          variant="ghost"
-          icon="i-heroicons-x-mark"
-          @click="isOpen = false"
-        />
+        <div class="flex items-center gap-2">
+          <UButton 
+            v-if="item"
+            icon="i-heroicons-trash" 
+            variant="soft" 
+            color="error" 
+            size="xs" 
+            class="rounded-lg px-3" 
+            label="Delete" 
+            @click="confirmDeleteItem" 
+          />
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-heroicons-x-mark"
+            @click="isOpen = false"
+          />
+        </div>
       </div>
     </template>
 
@@ -194,4 +227,13 @@ const removeImage = (index: number) => {
       </div>
     </template>
   </USlideover>
+
+  <AppConfirmModal
+    v-model:open="isDeleteItemModalOpen"
+    title="Delete Item?"
+    description="This will permanently remove this item from the menu. This action is irreversible."
+    confirm-button-text="Delete Item"
+    :loading="loading"
+    @confirm="deleteItem"
+  />
 </template>
