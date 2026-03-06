@@ -65,7 +65,7 @@ const deleteProject = async (id: number) => {
     <!-- Loading State -->
     <div v-if="status === 'pending'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <div v-for="i in 3" :key="i" class="h-80 w-full rounded-[3px] p-[1px] bg-white/5 bg-gradient-to-br from-emerald-500/20 to-transparent">
-        <USkeleton class="h-full w-full rounded-[31px] bg-[#0d0d0f]" />
+        <USkeleton class="h-full w-full rounded-[31px] bg-app-section" />
       </div>
     </div>
 
@@ -77,7 +77,7 @@ const deleteProject = async (id: number) => {
         class="group relative h-full rounded-[3px] p-[1px] bg-gradient-to-br from-white/10 via-transparent to-transparent hover:from-emerald-500/30 transition-all duration-700 cursor-pointer shadow-lg hover:shadow-emerald-500/10"
         @click="navigateTo(`/projects/${project.id}`)"
       >
-        <div class="h-full flex flex-col rounded-[31px] overflow-hidden bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white backdrop-blur-3xl transition-colors duration-500">
+        <div class="h-full flex flex-col rounded-[31px] overflow-hidden bg-app-section dark:bg-app-section light:bg-white backdrop-blur-3xl transition-colors duration-500">
           <!-- Cover Image Section -->
           <div class="relative h-44 w-full bg-zinc-900 overflow-hidden shrink-0">
             <img 
@@ -145,7 +145,7 @@ const deleteProject = async (id: number) => {
         class="group relative rounded-[3px] p-[1px] bg-gradient-to-r from-white/10 via-transparent to-transparent hover:from-emerald-500/30 transition-all duration-700 cursor-pointer"
         @click="navigateTo(`/projects/${project.id}`)"
       >
-        <div class="flex items-center gap-8 p-6 rounded-[28px] overflow-hidden bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white shadow-sm transition-colors duration-500">
+        <div class="flex items-center gap-8 p-6 rounded-[28px] overflow-hidden bg-app-section dark:bg-app-section light:bg-white shadow-sm transition-colors duration-500">
           <div class="size-28 rounded-2xl bg-zinc-900 flex items-center justify-center shrink-0 overflow-hidden border border-white/10 group-hover:border-emerald-500/30 transition-all">
             <img v-if="project.logo" :src="project.logo" class="size-full object-cover group-hover:scale-105 transition-transform duration-500" />
             <UIcon v-else name="i-heroicons-photo" class="size-10 text-zinc-700/50" />

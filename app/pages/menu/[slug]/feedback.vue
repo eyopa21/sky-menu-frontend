@@ -45,10 +45,10 @@ useHead({
 <template>
   <div 
     v-if="project" 
-    class="min-h-screen bg-[#fcfdfd] dark:bg-[#09090b] selection:bg-emerald-500/20"
+    class="min-h-screen bg-app-bg selection:bg-emerald-500/20"
   >
     <!-- Simple Header -->
-    <header class="sticky top-0 z-50 backdrop-blur-3xl border-b border-gray-100 dark:border-white/5 bg-white/70 dark:bg-[#09090b]/70">
+    <header class="sticky top-0 z-50 backdrop-blur-3xl border-b border-gray-100 dark:border-white/5 bg-app-bg/70">
        <div class="max-w-3xl mx-auto px-6 h-20 flex items-center justify-between">
           <UButton 
             variant="ghost" 
@@ -83,7 +83,7 @@ useHead({
 
        <!-- Overview Card -->
        <div class="p-[1px] rounded-[40px] bg-gradient-to-br from-emerald-500/20 to-transparent">
-          <div class="bg-white dark:bg-[#0d0d0f] rounded-[39px] p-8 md:p-10 shadow-sm border border-gray-100 dark:border-white/5">
+          <div class="bg-app-section rounded-[39px] p-8 md:p-10 shadow-sm border border-gray-100 dark:border-white/5">
              <FeedbackOverview 
                 ref="feedbackOverviewRef"
                 :project-id="project.id" 

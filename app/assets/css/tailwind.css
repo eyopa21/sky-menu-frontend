@@ -1,2 +1,20 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+@theme {
+  /* Base Backgrounds */
+  --color-app-bg: #f8fafc;
+  --color-app-section: #ffffff;
+}
+
+/* Dark mode overrides */
+.dark {
+  --color-app-bg: #011106;
+  --color-app-section: #141418;
+}
+
+@layer base {
+  body {
+    @apply bg-app-bg text-gray-900 dark:text-white transition-colors duration-500;
+  }
+}

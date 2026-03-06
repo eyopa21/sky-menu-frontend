@@ -53,7 +53,7 @@ const plans = [
 </script>
 
 <template>
-  <div id="pricing" class="py-28 px-6 lg:px-20 relative overflow-hidden transition-colors duration-500 bg-[#09090b] dark:bg-[#09090b] light:bg-[#fcfdfd]">
+  <div id="pricing" class="py-28 px-6 lg:px-20 relative overflow-hidden transition-colors duration-500 bg-app-bg">
     <!-- Top divider glow -->
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-xl h-px bg-gradient-to-r from-transparent via-white/10 dark:via-white/10 light:via-gray-200 to-transparent" />
     <!-- Background accent -->
@@ -96,7 +96,7 @@ const plans = [
               : 'bg-gradient-to-b from-white/10 to-white/5 dark:from-white/10 light:from-gray-200 group-hover:from-emerald-400/30'"
           >
             <div class="relative h-full rounded-[35px] p-10 flex flex-col transition-colors duration-500 shadow-sm"
-              :class="plan.popular ? 'bg-[#0a1a12] dark:bg-[#0a1a12] light:bg-[#f0fdf4]' : 'bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white'"
+              :class="plan.popular ? 'bg-[#0a1a12] dark:bg-[#0a1a12] light:bg-[#f0fdf4]' : 'bg-app-section dark:bg-app-section light:bg-white'"
             >
               <!-- Popular badge -->
               <div
@@ -146,7 +146,7 @@ const plans = [
                 class="flex items-center justify-center gap-2 w-full py-4.5 rounded-2xl text-base font-bold transition-all duration-300 hover:scale-[1.02] shadow-sm transform"
                 :class="plan.popular
                   ? 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-[0_4px_20px_0_rgba(52,211,153,0.3)] hover:shadow-[0_8px_40px_0_rgba(52,211,153,0.5)]'
-                  : 'bg-white/5 dark:bg-white/5 light:bg-[#fcfdfd] text-gray-300 dark:text-gray-300 light:text-gray-900 border border-white/10 dark:border-white/10 light:border-gray-200 hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-emerald-50 hover:text-white dark:hover:text-white light:hover:text-emerald-700 hover:border-emerald-500/30'"
+                  : 'bg-app-bg text-gray-300 dark:text-gray-300 light:text-gray-900 border border-white/10 dark:border-white/10 light:border-gray-200 hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-emerald-50 hover:text-white dark:hover:text-white light:hover:text-emerald-700 hover:border-emerald-500/30'"
               >
                 {{ plan.buttonText }}
                 <UIcon name="i-heroicons-arrow-right" class="size-5" />

@@ -1,5 +1,5 @@
 <template>
-  <div id="highlights" class="py-28 px-6 lg:px-20 relative overflow-hidden transition-colors duration-500 bg-[#09090b] dark:bg-[#09090b] light:bg-white">
+  <div id="highlights" class="py-28 px-6 lg:px-20 relative overflow-hidden transition-colors duration-500 bg-app-bg">
     <!-- Section top divider -->
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-xl h-px bg-gradient-to-r from-transparent via-white/10 dark:via-white/10 light:via-gray-200 to-transparent" />
 
@@ -23,7 +23,7 @@
         <div class="order-2 lg:order-1 relative group">
           <div class="absolute -inset-10 bg-purple-500/5 blur-[80px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
           <div class="relative p-[1px] rounded-[40px] bg-gradient-to-br from-purple-500/20 via-white/5 to-transparent dark:via-white/5 light:via-gray-200 transition-all duration-500 shadow-2xl overflow-hidden">
-            <div class="rounded-[39px] p-12 aspect-[4/3] flex items-center justify-center transition-colors duration-500 bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-[#fafafa]">
+            <div class="rounded-[39px] p-12 aspect-[4/3] flex items-center justify-center transition-colors duration-500 bg-app-section">
               <img
                 src="/demo/images/landing/mockup.svg"
                 class="w-3/5 h-auto drop-shadow-[0_25px_50px_rgba(0,0,0,0.5)] grayscale group-hover:grayscale-0 transition-all duration-1000 transform group-hover:scale-105 group-hover:rotate-1"
@@ -102,7 +102,7 @@
         <div class="group relative">
           <div class="absolute -inset-10 bg-yellow-500/5 blur-[80px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
           <div class="relative p-[1px] rounded-[40px] bg-gradient-to-br from-yellow-500/20 via-white/5 to-transparent dark:via-white/5 light:via-gray-200 transition-all duration-500 shadow-2xl overflow-hidden">
-            <div class="rounded-[39px] p-10 aspect-video flex items-center justify-center transition-colors duration-500 bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-[#fafafa]">
+            <div class="rounded-[39px] p-10 aspect-video flex items-center justify-center transition-colors duration-500 bg-app-section">
               <img
                 src="/demo/images/landing/mockup-desktop.svg"
                 class="w-full h-auto drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-1000 transform group-hover:scale-[1.02] group-hover:-rotate-0.5"
@@ -111,7 +111,7 @@
             </div>
           </div>
           <!-- Premium floaters -->
-          <div class="absolute -top-8 -left-8 p-5 rounded-2xl bg-[#111113] dark:bg-[#111113] light:bg-white border border-gray-200/10 dark:border-white/10 light:border-gray-200 shadow-2xl hidden lg:block transition-all duration-500 group-hover:translate-x-2 group-hover:-translate-y-1">
+          <div class="absolute -top-8 -left-8 p-5 rounded-2xl bg-app-section dark:bg-app-section light:bg-white border border-gray-200/10 dark:border-white/10 light:border-gray-200 shadow-2xl hidden lg:block transition-all duration-500 group-hover:translate-x-2 group-hover:-translate-y-1">
             <div class="flex items-center gap-4">
               <div class="size-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
                 <UIcon name="i-heroicons-user-group" class="size-5 text-emerald-500" />

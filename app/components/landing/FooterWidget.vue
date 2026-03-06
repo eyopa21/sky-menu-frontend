@@ -1,5 +1,5 @@
 <template>
-  <footer class="relative overflow-hidden transition-colors duration-500 bg-[#09090b] dark:bg-[#09090b] light:bg-[#fcfdfd]">
+  <footer class="relative overflow-hidden transition-colors duration-500 bg-app-bg">
     <!-- Top divider glow -->
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-white/8 dark:via-white/8 light:via-gray-200 to-transparent" />
     <!-- Background radial decor -->

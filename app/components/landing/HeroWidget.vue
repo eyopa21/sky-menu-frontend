@@ -73,7 +73,7 @@
 <template>
   <div
     id="hero"
-    class="relative flex flex-col overflow-hidden px-6 pt-32 pb-20 lg:px-20 min-h-screen justify-center transition-colors duration-500 bg-[#09090b] dark:bg-[#09090b] light:bg-[#fcfdfd]"
+    class="relative flex flex-col overflow-hidden px-6 pt-32 pb-20 lg:px-20 min-h-screen justify-center transition-colors duration-500 bg-app-bg"
   >
     <!-- ── Background Visuals ────────────────────────────── -->
     <div class="absolute inset-x-0 top-0 h-full overflow-hidden pointer-events-none opacity-60 dark:opacity-60 light:opacity-40">
@@ -83,8 +83,8 @@
         class="w-full h-full object-cover transition-all duration-1000 opacity-60"
       />
       <!-- Soft gradient overlays to blend the image without hiding it -->
-      <div class="absolute inset-0 bg-gradient-to-b from-[#09090b]/80 via-transparent to-[#09090b] dark:from-[#09090b]/80 dark:to-[#09090b] light:from-[#fcfdfd]/60 light:to-[#fcfdfd]" />
-      <div class="absolute inset-0 bg-gradient-to-r from-[#09090b]/40 via-transparent to-[#09090b]/40 dark:from-[#09090b]/40 dark:to-[#09090b]/40 light:from-[#fcfdfd]/20 light:to-[#fcfdfd]/20" />
+      <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-app-bg)]/80 via-transparent to-[var(--color-app-bg)] dark:from-[var(--color-app-bg)]/80 dark:to-[var(--color-app-bg)] light:from-[var(--color-app-bg)]/60 light:to-[var(--color-app-bg)]" />
+      <div class="absolute inset-0 bg-gradient-to-r from-[var(--color-app-bg)]/40 via-transparent to-[var(--color-app-bg)]/40 dark:from-[var(--color-app-bg)]/40 dark:to-[var(--color-app-bg)]/40 light:from-[var(--color-app-bg)]/20 light:to-[var(--color-app-bg)]/20" />
     </div>
 
     <!-- Animated background layer (Blobs & Grid) -->
@@ -169,9 +169,9 @@
 
         <!-- Card -->
         <div class="relative p-[1px] rounded-2xl bg-gradient-to-br from-emerald-500/25 via-white/5 to-purple-500/10 dark:from-emerald-500/25 dark:via-white/5 light:from-gray-200 light:via-white shadow-2xl shine group transition-all duration-500">
-          <div class="rounded-[15px] overflow-hidden bg-[#09090b]/90 dark:bg-[#09090b]/90 light:bg-white backdrop-blur-sm transition-colors duration-500">
+          <div class="rounded-[15px] overflow-hidden bg-app-bg/90 dark:bg-app-bg/90 light:bg-white backdrop-blur-sm transition-colors duration-500">
             <!-- Browser bar -->
-            <div class="h-9 bg-[#111113] dark:bg-[#111113] light:bg-gray-50 flex items-center px-4 gap-2 border-b border-white/5 dark:border-white/5 light:border-gray-100 shrink-0">
+            <div class="h-9 bg-app-section dark:bg-app-section light:bg-gray-50 flex items-center px-4 gap-2 border-b border-white/5 dark:border-white/5 light:border-gray-100 shrink-0">
               <div class="flex gap-1.5">
                 <div class="size-2.5 rounded-full bg-red-500/40" />
                 <div class="size-2.5 rounded-full bg-yellow-500/40" />
@@ -192,7 +192,7 @@
         </div>
 
         <!-- Floating indicators -->
-        <div class="absolute -left-4 sm:-left-12 top-1/4 bg-[#111113] dark:bg-[#111113] light:bg-white border border-white/10 dark:border-white/10 light:border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-md animate-bounce-slow">
+        <div class="absolute -left-4 sm:-left-12 top-1/4 bg-app-section dark:bg-app-section light:bg-white border border-white/10 dark:border-white/10 light:border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-md animate-bounce-slow">
           <div class="size-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
             <UIcon name="i-heroicons-banknotes" class="size-5 text-emerald-400 light:text-emerald-600" />
           </div>
@@ -202,7 +202,7 @@
           </div>
         </div>
 
-        <div class="absolute -right-4 sm:-right-12 bottom-1/3 bg-[#111113] dark:bg-[#111113] light:bg-white border border-white/10 dark:border-white/10 light:border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-md animate-bounce-slow" style="animation-delay: 1.5s;">
+        <div class="absolute -right-4 sm:-right-12 bottom-1/3 bg-app-section dark:bg-app-section light:bg-white border border-white/10 dark:border-white/10 light:border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-md animate-bounce-slow" style="animation-delay: 1.5s;">
           <div class="size-10 rounded-xl bg-purple-500/15 flex items-center justify-center">
             <UIcon name="i-heroicons-qr-code" class="size-5 text-purple-400 light:text-purple-600" />
           </div>

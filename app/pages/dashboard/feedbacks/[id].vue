@@ -74,7 +74,7 @@ useHead({
     <div v-else-if="feedback" class="space-y-10 animate-fade-in">
        <!-- Customer Profile Banner -->
        <div class="p-[1px] rounded-[48px] bg-gradient-to-br from-white/10 to-transparent">
-          <div class="bg-[#0d0d0f]/80 backdrop-blur-3xl rounded-[47px] p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start gap-10 md:gap-14">
+          <div class="bg-app-section/80 backdrop-blur-3xl rounded-[47px] p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start gap-10 md:gap-14">
              <div class="size-32 rounded-[40px] bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-2xl relative group overflow-hidden">
                 <span class="text-6xl font-black text-emerald-400 relative z-10">{{ feedback.name.charAt(0).toUpperCase() }}</span>
                 <div class="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -197,7 +197,7 @@ useHead({
         <div class="flex justify-end">
             <UButton color="neutral" variant="ghost" icon="i-heroicons-x-mark" size="xl" @click="isImageModalOpen = false" />
         </div>
-        <div class="rounded-[40px] overflow-hidden border border-white/10 shadow-2xl bg-[#09090b]">
+        <div class="rounded-[40px] overflow-hidden border border-white/10 shadow-2xl bg-app-bg">
            <img :src="selectedImage" class="w-full h-auto max-h-[80vh] object-contain mx-auto shadow-2xl" />
         </div>
       </div>

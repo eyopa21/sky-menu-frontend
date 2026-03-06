@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex bg-[#09090b] text-white overflow-hidden">
+  <div class="min-h-screen flex bg-app-bg text-white overflow-hidden">
     <!-- Left Side: Visual/Branding (Hidden on mobile) -->
     <div class="hidden lg:flex lg:w-1/2 relative p-12 flex-col justify-between overflow-hidden">
       <!-- Background Image with Overlay -->

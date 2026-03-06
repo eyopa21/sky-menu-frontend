@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen flex-col bg-[#09090b] dark:bg-[#09090b] light:bg-[#fcfdfd] transition-colors duration-500 overflow-hidden relative">
+  <div class="flex h-screen flex-col bg-app-bg transition-colors duration-500 overflow-hidden relative">
     <!-- Premium Background Decor (Consistent with Landing/Settings) -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden">
       <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full" />
@@ -14,7 +14,7 @@
       <!-- Main Content Area -->
       <div class="ml-80 grow overflow-hidden h-screen flex flex-col">
         <!-- New Feature / Announcement Bar (Refined) -->
-        <div class="shrink-0 bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-emerald-50 border-b border-white/5 dark:border-white/5 light:border-emerald-100/50 overflow-hidden relative group">
+        <div class="shrink-0 bg-app-section light:bg-emerald-50 border-b border-white/5 dark:border-white/5 light:border-emerald-100/50 overflow-hidden relative group">
           <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
           <div class="flex items-center justify-between px-8 py-3 relative z-10">
             <div class="flex items-center gap-3">
@@ -38,7 +38,7 @@
         <!-- Dashboard Content Scroll Area -->
         <div class="grow overflow-y-auto custom-scrollbar p-8">
           <div class="min-h-full rounded-[3px] p-[1px] bg-gradient-to-br from-white/5 via-transparent to-white/5 dark:from-white/5 light:from-gray-200 shadow-2xl">
-            <div class="min-h-full bg-[#0d0d0f]/60 dark:bg-[#0d0d0f]/60 light:bg-white/80 backdrop-blur-2xl rounded-sm p-4 md:p-10 transition-colors duration-500 relative">
+            <div class="min-h-screen bg-app-bg light:bg-app-section backdrop-blur-2xl rounded-sm p-4 md:p-10 transition-colors duration-500 relative">
               <!-- Content Glow -->
               <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.03),transparent)] pointer-events-none" />
               <slot />

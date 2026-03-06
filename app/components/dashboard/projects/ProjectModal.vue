@@ -96,7 +96,7 @@ const deleteProject = async () => {
   <USlideover 
     v-model:open="isOpen"
     :ui="{ 
-      content: 'bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white border-white/10 dark:border-white/10 light:border-gray-200' 
+      content: 'bg-app-section border-white/10 dark:border-white/10 light:border-gray-200' 
     }"
   >
     <template #header>
@@ -209,7 +209,7 @@ const deleteProject = async () => {
                   </div>
                   <p class="text-[10px] font-black uppercase tracking-widest" :class="state.menuUIType === type ? 'text-emerald-400' : 'text-gray-500'">Style {{ type }}</p>
                 </div>
-                <div v-if="state.menuUIType === type" class="absolute -top-1 -right-1 size-5 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-[#0d0d0f]">
+                <div v-if="state.menuUIType === type" class="absolute -top-1 -right-1 size-5 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-app-section">
                   <UIcon name="i-heroicons-check" class="size-3 text-black font-black" />
                 </div>
               </div>

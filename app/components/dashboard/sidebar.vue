@@ -16,20 +16,20 @@ const items = ref([
         to: '/projects',
         active: true
       },
-      {
-        label: 'QR Generation',
-        icon: 'i-heroicons-qr-code',
-      },
-      {
-        label: 'Analytics',
-        icon: 'i-heroicons-chart-bar-square',
-      },
+      // {
+      //   label: 'QR Generation',
+      //   icon: 'i-heroicons-qr-code',
+      // },
+      // {
+      //   label: 'Analytics',
+      //   icon: 'i-heroicons-chart-bar-square',
+      // },
     ],
   },
   {
     label: 'Resources',
     icon: 'i-heroicons-book-open',
-    open: false,
+    open: true,
     items: [
       {
         label: 'Feedbacks',
@@ -37,8 +37,9 @@ const items = ref([
         to: '/dashboard/feedbacks',
       },
       {
-        label: 'Help Center',
-        icon: 'i-heroicons-lifebuoy',
+        label: 'Payment Methods',
+        icon: 'i-heroicons-currency-dollar',
+        
       },
     ],
   },
@@ -58,7 +59,7 @@ function isActive(to?: string) {
 </script>
 
 <template>
-  <div class="fixed h-screen w-80 border-r border-white/5 dark:border-white/5 light:border-gray-100 bg-[#09090b]/95 dark:bg-[#09090b]/95 light:bg-[#fcfdfd] backdrop-blur-3xl z-50">
+  <div class="fixed h-screen w-80 border-r border-white/5 dark:border-white/5 light:border-gray-100 bg-app-bg/95 dark:bg-app-bg/95 light:bg-app-bg backdrop-blur-3xl z-50">
     <!-- Sidebar Decor -->
     <div class="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-emerald-500/5 to-transparent pointer-events-none" />
 

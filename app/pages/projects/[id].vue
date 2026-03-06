@@ -157,11 +157,11 @@ const goToCategories = () => {
       <!-- Left Overlay Column: Identity Card -->
       <div class="lg:col-span-4 space-y-10">
         <div class="p-[1px] rounded-3xl bg-gradient-to-br from-white/10 via-transparent to-transparent shadow-2xl">
-          <div class="bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white rounded-[23px] overflow-hidden backdrop-blur-3xl">
+          <div class="bg-app-section dark:bg-app-section light:bg-white rounded-[23px] overflow-hidden backdrop-blur-3xl">
             <!-- Cover Art -->
             <div class="relative h-64 w-full overflow-hidden shrink-0 group/cover border-b border-white/5">
               <img v-if="project.coverImage" :src="project.coverImage" class="h-full w-full object-cover transition-transform duration-[3000ms] group-hover/cover:scale-110 opacity-60" />
-              <div class="absolute inset-0 bg-gradient-to-t from-[#0d0d0f] via-transparent to-transparent" />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#141418] via-transparent to-transparent" />
               
               <div class="absolute -bottom-12 left-8 z-10 transition-transform duration-500 group-hover/cover:translate-y-[-4px]">
                 <div class="size-28 rounded-2xl bg-zinc-900 border-[8px] border-zinc-950 dark:border-zinc-950 light:border-white shadow-2xl overflow-hidden">
@@ -210,7 +210,7 @@ const goToCategories = () => {
 
         <!-- Digital Access (QR Code) - REFINED -->
         <div class="p-[1px] rounded-[40px] bg-gradient-to-br from-white/10 to-transparent shadow-2xl">
-          <div class="bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white rounded-[39px] p-8 space-y-8 flex flex-col items-center text-center">
+          <div class="bg-app-section dark:bg-app-section light:bg-white rounded-[39px] p-8 space-y-8 flex flex-col items-center text-center">
             <div class="space-y-2">
               <h3 class="text-xl font-black text-white dark:text-white light:text-gray-900 uppercase tracking-tighter">Digital Access</h3>
               <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest leading-none">Scanning opens live menu</p>
@@ -223,7 +223,7 @@ const goToCategories = () => {
                     :size="160"
                     level="H"
                     render-as="canvas"
-                    foreground="#0d0d0f"
+                    foreground="#141418"
                     background="#ffffff"
                   />
                </div>
@@ -272,7 +272,7 @@ const goToCategories = () => {
                 <template #info>
                     <div class="mt-8 space-y-6 animate-fade-in">
                        <div class="p-[1px] rounded-[32px] bg-gradient-to-br from-white/10 to-transparent">
-                          <UCard class="bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white border-none rounded-[31px]">
+                          <UCard class="bg-app-section dark:bg-app-section light:bg-white border-none rounded-[31px]">
                              <div class="p-4 md:p-8 space-y-12">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                                    <div class="space-y-2">
@@ -347,7 +347,7 @@ const goToCategories = () => {
 
                        <div v-if="categories?.length" class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
                           <div v-for="category in categories" :key="category.id" class="p-[1px] rounded-[28px] bg-gradient-to-br from-white/5 to-transparent hover:from-white/10 transition-all duration-500">
-                             <div class="bg-[#0d0d0f]/60 dark:bg-[#0d0d0f]/60 light:bg-white backdrop-blur-3xl rounded-[27px] p-5 group flex gap-5">
+                             <div class="bg-app-section/60 dark:bg-app-section/60 light:bg-white backdrop-blur-3xl rounded-[27px] p-5 group flex gap-5">
                                 <div class="relative shrink-0">
                                    <div v-if="category.imageUrl" class="size-20 rounded-2xl overflow-hidden border border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-500">
                                       <img :src="category.imageUrl" class="size-full object-cover" />
@@ -398,7 +398,7 @@ const goToCategories = () => {
 
                            <div v-if="project.menu.menuItems?.length" class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
                               <div v-for="item in project.menu.menuItems" :key="item.id" class="p-[1px] rounded-[32px] bg-gradient-to-br from-white/5 to-transparent hover:from-white/10 transition-all duration-500">
-                                 <div class="bg-[#0d0d0f]/60 dark:bg-[#0d0d0f]/60 light:bg-white backdrop-blur-3xl rounded-[31px] p-6 group flex gap-6">
+                                 <div class="bg-app-section/60 dark:bg-app-section/60 light:bg-white backdrop-blur-3xl rounded-[31px] p-6 group flex gap-6">
                                     <div class="relative shrink-0 flex items-center">
                                        <div v-if="item.images?.length" class="size-24 rounded-[26px] overflow-hidden border border-white/10 shadow-2xl group-hover:rotate-2 transition-transform duration-500">
                                           <img :src="item.images[0]" class="size-full object-cover" />

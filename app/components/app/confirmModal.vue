@@ -24,7 +24,7 @@ function onCancel() {
 <template>
   <UModal v-model:open="isOpen">
     <template #content>
-      <div class="p-8 space-y-8 text-center bg-[#0d0d0f] border border-white/10 rounded-[32px] overflow-hidden">
+      <div class="p-8 space-y-8 text-center bg-app-section border border-white/10 rounded-[32px] overflow-hidden">
         <div class="mx-auto size-20 rounded-3xl bg-red-500/10 flex items-center justify-center">
           <UIcon name="i-heroicons-exclamation-triangle" class="size-10 text-red-500" />
         </div>

@@ -63,7 +63,7 @@ async function onLogout() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#09090b] dark:bg-[#09090b] light:bg-[#fcfdfd] transition-colors duration-500 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+  <div class="min-h-screen bg-app-bg transition-colors duration-500 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
     <!-- Background Decor -->
     <div class="absolute inset-0 pointer-events-none">
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
@@ -147,7 +147,7 @@ async function onLogout() {
               </div>
               <div v-else class="relative group">
                  <div class="p-[1px] rounded-[32px] bg-gradient-to-br from-white/10 to-transparent dark:from-white/10 light:from-gray-200">
-                    <UCard class="bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white border-none rounded-[31px] min-h-[400px] flex items-center justify-center text-center p-12 overflow-hidden shadow-sm">
+                    <UCard class="bg-app-section dark:bg-app-section light:bg-white border-none rounded-[31px] min-h-[400px] flex items-center justify-center text-center p-12 overflow-hidden shadow-sm">
                       <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(52,211,153,0.05),transparent)] pointer-events-none" />
                       <div class="relative z-10 flex flex-col items-center">
                         <div class="size-20 rounded-3xl bg-emerald-500/10 flex items-center justify-center mb-6">
@@ -170,7 +170,7 @@ async function onLogout() {
       <UModal
         v-model:open="logoutModalOpen"
         :ui="{ 
-          content: 'bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white border-white/10 dark:border-white/10 light:border-gray-200 rounded-[28px]' 
+          content: 'bg-app-section dark:bg-app-section light:bg-white border-white/10 dark:border-white/10 light:border-gray-200 rounded-[28px]' 
         }"
       >
         <template #content>

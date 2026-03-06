@@ -68,11 +68,11 @@ async function onSubmit() {
 </script>
 
 <template>
-  <div class="bg-white rounded-[32px] p-8 md:p-12 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] border border-gray-100">
+  <div class="bg-app-section rounded-[32px] p-8 md:p-12 shadow-sm border border-gray-100 dark:border-white/5 transition-colors duration-500">
     <div class="space-y-8">
       <div class="text-center space-y-2">
-        <h3 class="text-3xl font-black italic uppercase tracking-tight text-gray-900">Share your experience</h3>
-        <p class="text-sm text-gray-500 font-medium">Your feedback helps us improve our service and quality.</p>
+        <h3 class="text-3xl font-black italic uppercase tracking-tight text-gray-900 dark:text-white">Share your experience</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Your feedback helps us improve our service and quality.</p>
       </div>
 
       <div class="flex justify-center gap-2">

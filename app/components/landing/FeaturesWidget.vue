@@ -67,7 +67,7 @@ const features = [
 </script>
 
 <template>
-  <div id="features" class="py-28 px-6 lg:px-20 relative overflow-hidden transition-colors duration-500 bg-[#09090b] dark:bg-[#09090b] light:bg-[#fcfdfd]">
+  <div id="features" class="py-28 px-6 lg:px-20 relative overflow-hidden transition-colors duration-500 bg-app-bg">
     <!-- Subtle divider glow -->
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-8 bg-emerald-500/5 blur-xl" />
@@ -114,7 +114,7 @@ const features = [
       <div class="mt-32 relative group">
         <div class="absolute inset-0 bg-emerald-500/5 blur-3xl rounded-full scale-110 opacity-30 group-hover:opacity-60 transition-opacity duration-700" />
         <div class="relative p-[1px] rounded-[40px] bg-gradient-to-br from-emerald-500/20 via-white/5 to-transparent shadow-2xl transition-all duration-500 hover:scale-[1.005]">
-          <div class="rounded-[39px] py-16 px-6 md:px-24 text-center transition-colors duration-500 bg-[#0d0d0f] dark:bg-[#0d0d0f] light:bg-white">
+          <div class="rounded-[39px] py-16 px-6 md:px-24 text-center transition-colors duration-500 bg-app-section dark:bg-app-section light:bg-white">
             <div class="flex flex-col items-center">
               <div class="relative mb-10">
                 <div class="absolute -inset-4 bg-emerald-500/10 blur-2xl rounded-full animate-pulse" />

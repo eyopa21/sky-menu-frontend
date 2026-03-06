@@ -39,7 +39,7 @@ function scrollTo(href: string) {
   <!-- Top gradient accent line -->
   <div class="fixed top-0 left-0 right-0 z-[60] h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-80" />
 
-  <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-16 px-6 lg:px-12 border-b border-white/[0.06] dark:border-white/[0.06] light:border-gray-200 bg-[#09090b]/80 dark:bg-[#09090b]/80 light:bg-white/90 backdrop-blur-xl shadow-[0_4px_30px_0_rgba(0,0,0,0.5)] dark:shadow-[0_4px_30px_0_rgba(0,0,0,0.5)] light:shadow-sm transition-all duration-500">
+  <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-16 px-6 lg:px-12 border-b border-white/[0.06] dark:border-white/[0.06] light:border-gray-200 bg-app-bg/80 dark:bg-app-bg/80 light:bg-white/90 backdrop-blur-xl shadow-[0_4px_30px_0_rgba(0,0,0,0.5)] dark:shadow-[0_4px_30px_0_rgba(0,0,0,0.5)] light:shadow-sm transition-all duration-500">
 
     <!-- Logo -->
     <NuxtLink to="/" class="flex items-center gap-2.5 group shrink-0">
@@ -169,7 +169,7 @@ function scrollTo(href: string) {
   >
     <div
       v-if="mobileOpen"
-      class="md:hidden fixed top-16 left-0 right-0 z-40 bg-[#09090b]/95 dark:bg-[#09090b]/95 light:bg-white/95 backdrop-blur-xl border-b border-white/[0.06] dark:border-white/[0.06] light:border-gray-200 p-4 space-y-1 shadow-2xl transition-colors duration-500"
+      class="md:hidden fixed top-16 left-0 right-0 z-40 bg-app-bg/95 dark:bg-app-bg/95 light:bg-white/95 backdrop-blur-xl border-b border-white/[0.06] dark:border-white/[0.06] light:border-gray-200 p-4 space-y-1 shadow-2xl transition-colors duration-500"
     >
       <button
         v-for="link in navLinks"

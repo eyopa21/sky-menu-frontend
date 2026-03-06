@@ -76,7 +76,7 @@ const formatDate = (dateString: string) => {
                 class="w-full"
                 icon="i-heroicons-funnel"
                 :ui-menu="{ 
-                  content: 'rounded-2xl bg-[#0d0d0f] border-white/10 text-white',
+                  content: 'rounded-2xl bg-app-section border-white/10 text-white',
                 }"
              />
           </div>
@@ -103,7 +103,7 @@ const formatDate = (dateString: string) => {
         class="group relative p-[1px] rounded-[32px] bg-gradient-to-br from-white/5 to-transparent hover:from-emerald-500/20 transition-all duration-500 cursor-pointer"
         @click="navigateTo(`/dashboard/feedbacks/${feedback.id}`)"
       >
-        <div class="bg-[#0d0d0f]/60 backdrop-blur-3xl rounded-[31px] p-8 space-y-6">
+        <div class="bg-app-section/60 backdrop-blur-3xl rounded-[31px] p-8 space-y-6">
           <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div class="flex items-center gap-5">
               <div class="size-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 text-emerald-400 font-black text-2xl shadow-lg">

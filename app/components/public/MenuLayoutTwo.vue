@@ -85,7 +85,7 @@ const flipPrev = () => flipbook?.flipPrev()
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#0a0a0b] flex flex-col items-center justify-center py-10 px-4 overflow-hidden selection:bg-emerald-500/30 font-sans">
+  <div class="min-h-screen bg-app-bg flex flex-col items-center justify-center py-10 px-4 overflow-hidden selection:bg-emerald-500/30 font-sans">
     
     <!-- Flipbook Container -->
     <div class="relative w-full max-w-6xl aspect-[1.5/1] flex flex-col items-center">

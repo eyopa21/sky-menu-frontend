@@ -43,7 +43,7 @@ async function onSubmit(event: { data: TResetPasswordValidationSchema }) {
 
     <div class="p-[1px] rounded-[32px] bg-gradient-to-br from-white/10 to-transparent dark:from-white/10 light:from-gray-200 transition-all duration-500 shadow-sm">
       <UCard
-        class="bg-[#0d0d0f]/80 dark:bg-[#0d0d0f]/80 light:bg-white border-none rounded-[31px] backdrop-blur-2xl"
+        class="bg-app-section/80 dark:bg-app-section/80 light:bg-white border-none rounded-[31px] backdrop-blur-2xl"
         :ui="{ body: { padding: 'p-8 md:p-12' } }"
       >
         <UForm

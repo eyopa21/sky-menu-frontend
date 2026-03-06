@@ -15,7 +15,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="min-h-screen bg-white text-gray-900 font-sans p-8 md:p-16">
+  <div class="min-h-screen bg-app-bg text-gray-900 font-sans p-8 md:p-16">
     <header class="max-w-3xl mx-auto space-y-8 mb-20 text-center">
       <div v-if="project.logo" class="size-24 mx-auto rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
         <img :src="project.logo" class="size-full object-cover" />

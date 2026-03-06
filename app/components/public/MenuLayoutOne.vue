@@ -49,14 +49,14 @@ const activeCategoryItems = computed(() => {
 
 <template>
   <div 
-    class="min-h-screen bg-[#f1f0ee] dark:bg-[#09090b] text-gray-900 dark:text-white font-sans selection:bg-opacity-20 transition-colors duration-500"
-    :style="{ '--selection-bg': (project.primaryColor || '#4a3423') + '33' }"
+    v-if="project" 
+    class="min-h-screen bg-app-bg selection:bg-emerald-500/20"
   >
     <!-- Top Nav -->
-    <nav class="sticky top-0 z-50 bg-[#f1f0ee]/80 dark:bg-[#09090b]/80 backdrop-blur-xl border-b border-gray-200/40 dark:border-white/5 py-5 transition-colors duration-500">
+    <nav class="sticky top-0 z-50 bg-app-bg/80 backdrop-blur-xl border-b border-gray-200/40 dark:border-white/5 py-5 transition-colors duration-500">
       <div class="max-w-7xl mx-auto px-8 h-10 flex items-center justify-between">
         <div class="flex items-center gap-5">
-          <div class="size-11 rounded-xl overflow-hidden shadow-sm bg-zinc-800 border border-black/5 dark:border-white/10">
+          <div class="size-11 rounded-xl overflow-hidden shadow-sm bg-app-section border border-black/5 dark:border-white/10">
             <img v-if="project.logo" :src="project.logo" class="size-full object-cover" />
           </div>
           <span 

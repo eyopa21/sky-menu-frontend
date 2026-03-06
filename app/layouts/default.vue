@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#09090b]">
+  <div class="min-h-screen bg-app-bg">
     <NavHeader />
     <slot />
     <LandingFooterWidget />

@@ -96,7 +96,7 @@ useHead({
        <UButton 
           icon="i-heroicons-chat-bubble-bottom-center-text" 
           size="xl" 
-          class="rounded-full size-16 shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border-4 border-white dark:border-[#09090b]"
+          class="rounded-full size-16 shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border-4 border-white dark:border-[var(--color-app-bg)]"
           :style="{ backgroundColor: project.primaryColor || '#10b981', color: 'white' }"
           @click="navigateTo(`/menu/${slug}/feedback`)"
        />
